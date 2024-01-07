@@ -4,12 +4,13 @@ import blackIcon from "./img/keepMe-lightmode.png";
 import Image from "next/image";
 import { FaXmark } from "react-icons/fa6";
 import Link from "next/link";
-import { FaHome, FaExchangeAlt } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 import { MdOutlineNotes, MdOutlineManageSearch } from "react-icons/md";
 import { MdFavorite, MdOutlinePersonAddAlt } from "react-icons/md";
 import { CiTrash, CiLogin } from "react-icons/ci";
 import { utilStore } from "../store/store";
 import { usePathname } from "next/navigation";
+import { TbArrowsExchange } from "react-icons/tb";
 function Sidebar() {
   const pathname = usePathname();
   const { openNavBar, setOpenNavbar } = utilStore();
@@ -29,17 +30,19 @@ function Sidebar() {
           <FaXmark />
         </button>
       </header>
-      <div className="w-[90%] rounded-sm bg-black/15 sm:flex items-center px-2 py-1 h-10 mx-auto mt-3 gap-2 hidden">
-        <button className="text-[#120C18] text-2xl">
-          <MdOutlineManageSearch />
-        </button>
-        <input
-          type="text"
-          name="searchbox"
-          placeholder="Search your Notes"
-          className="bg-transparent h-full outline-none text-[#120C18]"
-        />
-      </div>
+      {pathname === "/notes" && (
+        <div className="w-[90%] rounded-sm bg-black/15 sm:flex items-center px-2 py-1 h-10 mx-auto mt-3 gap-2 hidden">
+          <button className="text-[#120C18] text-2xl">
+            <MdOutlineManageSearch />
+          </button>
+          <input
+            type="text"
+            name="searchbox"
+            placeholder="Search your Notes"
+            className="bg-transparent h-full outline-none text-[#120C18]"
+          />
+        </div>
+      )}
       <div className=" px-3.5 pt-2  text-[#120C18]">
         <small className="text-[#120C18]/80 text-[11px] font-extrabold">
           MAIN MENU
@@ -136,7 +139,7 @@ function Sidebar() {
             >
               <span>
                 {" "}
-                <FaExchangeAlt />
+                <TbArrowsExchange />
               </span>
               <small>CHANGE PASSWORD</small>
             </div>

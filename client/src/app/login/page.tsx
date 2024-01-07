@@ -9,18 +9,18 @@ import Link from "next/link";
 import { MdScheduleSend, MdSend } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
+import { useRouter } from "next/navigation";
 interface Data {
-  email: string;
   username: string;
   password: string;
 }
 function Login() {
+  const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm<Data>({
     defaultValues: {
-      email: "",
       username: "",
       password: "",
     },
@@ -37,11 +37,17 @@ function Login() {
           position: matches ? "bottom-right" : "top-center",
         });
         reset();
+        router.push("/notes");
       }
     } catch (err: any) {
-      toast.success(err.response.data.message, {
-        position: matches ? "bottom-right" : "top-center",
-      });
+      toast.error(
+        err.response?.data.message
+          ? err.response.data.message
+          : "Error while logging in, please try again",
+        {
+          position: matches ? "bottom-right" : "top-center",
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -49,7 +55,7 @@ function Login() {
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form
-        className="w-full h-[430px] md:w-[70%] shadow-sm shadow-[#120C18] rounded-sm p-2"
+        className="w-full h-[380px] md:w-[70%] shadow-sm shadow-[#120C18] rounded-sm p-2"
         onSubmit={handleSubmit(formSubmit)}
       >
         <header className="px-1.5 py-1 flex flex-col relative">
@@ -57,21 +63,6 @@ function Login() {
           <small className="text-[#120C18]">Authenticate yourself</small>
         </header>
         <div className="pt-8 px-2 space-y-2">
-          <div className="space-y-1 flex flex-col">
-            <label htmlFor="username" className="font-semibold text-[0.7rem]">
-              EMAIL ADDRESS
-            </label>
-            <input
-              required
-              {...register("email")}
-              type="email"
-              id="email"
-              name="email"
-              autoComplete="off"
-              placeholder="e.g johnwaltz@gmail.com"
-              className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80"
-            />
-          </div>
           <div className="space-y-1 flex flex-col">
             <label htmlFor="username" className="font-semibold text-[0.7rem]">
               USERNAME

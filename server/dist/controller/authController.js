@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLogIn = exports.getSignUp = void 0;
+exports.changePassword = exports.getLogIn = exports.getSignUp = void 0;
 const userModel_1 = require("../model/userModel");
 const jwt_1 = require("../token/jwt");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -47,3 +47,27 @@ const getLogIn = async (req, res) => {
     }
 };
 exports.getLogIn = getLogIn;
+const changePassword = async (req, res) => {
+    const { password, newpassword } = req.body;
+    try {
+        const findUser = await userModel_1.User.findById(req.user._id);
+        if (!findUser) {
+            res.status(400);
+            throw new Error("User not found");
+        }
+        const passwordCompare = await bcrypt_1.default.compare(password, findUser.password);
+        console.log("Waiting");
+        if (!passwordCompare) {
+            return res
+                .status(400)
+                .json({ message: "Invalid Current password, please try again" });
+        }
+        findUser.password = newpassword;
+        await findUser.save();
+        return res.status(200).json({ message: "Password successfully change" });
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
+exports.changePassword = changePassword;
