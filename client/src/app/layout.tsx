@@ -3,6 +3,8 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+import { Toaster } from "sonner";
+import NextTopLoader from "nextjs-toploader";
 const DMSans = DM_Sans({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +21,9 @@ export default function RootLayout({
       <body className={`${DMSans.className} flex`}>
         <Sidebar />
         <Header />
+        <NextTopLoader color="#120C18" shadow={false} />
         {children}
+        <Toaster duration={3000} />
       </body>
     </html>
   );
