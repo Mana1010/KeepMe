@@ -2,7 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { BsMenuButtonWideFill } from "react-icons/bs";
-import { utilStore } from "../store/store";
+import { utilStore } from "../../store/store";
 function Header() {
   const { openNavBar, setOpenNavbar } = utilStore();
   return (

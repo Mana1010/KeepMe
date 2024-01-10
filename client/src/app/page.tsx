@@ -3,7 +3,14 @@ import Image from "next/image";
 import { useEffect } from "react";
 import keepMeIcon from "./components/img/keepMe.png";
 import Link from "next/link";
+import { utilStore } from "@/store/store";
+import { useRouter } from "next/navigation";
 export default function Home() {
+  const router = useRouter();
+  const { setCurrentUser, currentUser } = utilStore();
+  useEffect(() => {
+    setCurrentUser();
+  }, []);
   return (
     <main className="grid grid-cols-1 md:grid-cols-2 items-center h-screen w-full px-4">
       <div className="flex flex-col w-full justify-center items-center">
@@ -13,7 +20,19 @@ export default function Home() {
         <p className="text-lg italic text-[#120C18]">
           Capture. Organize. Create.
         </p>
-        <button className="mt-2 w-[70%] text-white bg-[#120C18] h-[45px]">
+        <button
+          className="mt-2 w-[70%] text-white bg-[#120C18] h-[45px]"
+          onClick={() => {
+            if (currentUser) {
+              router.push("/notes");
+            } else {
+              router.push(
+                "/login?" +
+                  new URLSearchParams({ message: "You are not login yet!" })
+              );
+            }
+          }}
+        >
           ADD YOUR NOTES
         </button>
         <div>

@@ -20,9 +20,10 @@ export const protectedRoutes = async (
       userToken,
       process.env.ACCESS_TOKEN_KEY!
     ) as JwtPayload;
-    req.user = await User.findById(token.id);
+    req.user = await User.findById(token.id).select("-password");
     next();
   } catch (err) {
+    req.user = null;
     res.status(401);
     next();
   }

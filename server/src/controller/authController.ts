@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 import { User } from "../model/userModel";
-import { createAccessToken } from "../token/jwt";
-import bcrypt from "bcrypt";
+import { createAccessToken } from "../utils/jwtToken";
+import bcrypt, { hash } from "bcrypt";
 import { RequestExtend } from "../middleware/protectedRoutes";
 export const getSignUp = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
   try {
-    await User.create({ email, username, password });
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+    await User.create({ email, username, password: hashedPassword });
     res.status(201).json({ message: "Successfully Sign Up" });
   } catch (err: any) {
     res.status(400).json({
@@ -46,22 +48,31 @@ export const getLogIn = async (req: Request, res: Response) => {
 export const changePassword = async (req: RequestExtend, res: Response) => {
   const { password, newpassword } = req.body;
   try {
+    if (!req.user) {
+      throw new Error("User not login");
+    }
     const findUser = await User.findById(req.user._id);
     if (!findUser) {
-      res.status(400);
+      res.status(404);
       throw new Error("User not found");
     }
     const passwordCompare = await bcrypt.compare(password, findUser.password);
-    console.log("Waiting");
     if (!passwordCompare) {
-      return res
-        .status(400)
-        .json({ message: "Invalid Current password, please try again" });
+      throw new Error("Invalid Current password, please try again");
     }
-    findUser.password = newpassword;
+    const salt = await bcrypt.genSalt();
+    findUser.password = await bcrypt.hash(newpassword, salt);
     await findUser.save();
-    return res.status(200).json({ message: "Password successfully change" });
+    res.status(200).json({ message: "Password successfully change" });
   } catch (err: any) {
-    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+export const verifyAccount = (req: RequestExtend, res: Response) => {
+  if (req.user) {
+    res.status(200).json({ message: req.user });
+  } else {
+    console.log("It is not working");
+    res.status(401).json({ message: "Error" });
   }
 };

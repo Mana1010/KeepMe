@@ -3,14 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePassword = exports.getLogIn = exports.getSignUp = void 0;
+exports.verifyAccount = exports.changePassword = exports.getLogIn = exports.getSignUp = void 0;
 const userModel_1 = require("../model/userModel");
-const jwt_1 = require("../token/jwt");
+const jwtToken_1 = require("../utils/jwtToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const getSignUp = async (req, res) => {
     const { email, username, password } = req.body;
     try {
-        await userModel_1.User.create({ email, username, password });
+        const salt = await bcrypt_1.default.genSalt();
+        const hashedPassword = await bcrypt_1.default.hash(password, salt);
+        await userModel_1.User.create({ email, username, password: hashedPassword });
         res.status(201).json({ message: "Successfully Sign Up" });
     }
     catch (err) {
@@ -30,7 +32,7 @@ const getLogIn = async (req, res) => {
         if (!findUser || !passwordCompare) {
             throw new Error("Opps! Wrong Credentials");
         }
-        const token = (0, jwt_1.createAccessToken)(findUser?._id.toString());
+        const token = (0, jwtToken_1.createAccessToken)(findUser?._id.toString());
         res
             .status(201)
             .cookie("userToken", token, {
@@ -50,24 +52,35 @@ exports.getLogIn = getLogIn;
 const changePassword = async (req, res) => {
     const { password, newpassword } = req.body;
     try {
+        if (!req.user) {
+            throw new Error("User not login");
+        }
         const findUser = await userModel_1.User.findById(req.user._id);
         if (!findUser) {
-            res.status(400);
+            res.status(404);
             throw new Error("User not found");
         }
         const passwordCompare = await bcrypt_1.default.compare(password, findUser.password);
-        console.log("Waiting");
         if (!passwordCompare) {
-            return res
-                .status(400)
-                .json({ message: "Invalid Current password, please try again" });
+            throw new Error("Invalid Current password, please try again");
         }
-        findUser.password = newpassword;
+        const salt = await bcrypt_1.default.genSalt();
+        findUser.password = await bcrypt_1.default.hash(newpassword, salt);
         await findUser.save();
-        return res.status(200).json({ message: "Password successfully change" });
+        res.status(200).json({ message: "Password successfully change" });
     }
     catch (err) {
-        console.log(err);
+        res.status(400).json({ message: err.message });
     }
 };
 exports.changePassword = changePassword;
+const verifyAccount = (req, res) => {
+    if (req.user) {
+        res.status(200).json({ message: req.user });
+    }
+    else {
+        console.log("It is not working");
+        res.status(401).json({ message: "Error" });
+    }
+};
+exports.verifyAccount = verifyAccount;

@@ -15,10 +15,11 @@ const protectedRoutes = async (req, res, next) => {
     }
     try {
         const token = jsonwebtoken_1.default.verify(userToken, process.env.ACCESS_TOKEN_KEY);
-        req.user = await userModel_1.User.findById(token.id);
+        req.user = await userModel_1.User.findById(token.id).select("-password");
         next();
     }
     catch (err) {
+        req.user = null;
         res.status(401);
         next();
     }

@@ -43,14 +43,15 @@ function ChangePassword() {
         }
       );
       if (url.status === 200) {
+        reset();
+        router.refresh();
         toast.success(url.data.message, {
           position: matches ? "bottom-right" : "top-center",
         });
-        reset();
-        router.refresh();
       }
     } catch (err: any) {
-      toast.error(err.response.data.message, {
+      console.log(err);
+      toast.error(err.response?.data.message && err.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     } finally {

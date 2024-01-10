@@ -8,12 +8,12 @@ import { FaHome } from "react-icons/fa";
 import { MdOutlineNotes, MdOutlineManageSearch } from "react-icons/md";
 import { MdFavorite, MdOutlinePersonAddAlt } from "react-icons/md";
 import { CiTrash, CiLogin } from "react-icons/ci";
-import { utilStore } from "../store/store";
+import { utilStore } from "../../store/store";
 import { usePathname } from "next/navigation";
 import { TbArrowsExchange } from "react-icons/tb";
 function Sidebar() {
   const pathname = usePathname();
-  const { openNavBar, setOpenNavbar } = utilStore();
+  const { openNavBar, setOpenNavbar, currentUser } = utilStore();
   return (
     <div
       className={`absolute h-screen md:w-[250px] w-[40%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
@@ -147,7 +147,11 @@ function Sidebar() {
         </ul>
       </div>
       <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center">
-        <small className="text-[#120C18]">You are not log in yet!!</small>
+        <small className="text-[#120C18]">
+          {currentUser
+            ? `Hey, ${currentUser.username}`
+            : "You are not log in yet!"}
+        </small>
       </footer>
     </div>
   );

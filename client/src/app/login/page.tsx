@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
@@ -10,11 +10,15 @@ import { MdScheduleSend, MdSend } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { utilStore } from "@/store/store";
 interface Data {
   username: string;
   password: string;
 }
 function Login() {
+  const search = useSearchParams();
+  const { setCurrentUser, currentUser } = utilStore();
   const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +41,7 @@ function Login() {
           position: matches ? "bottom-right" : "top-center",
         });
         reset();
+        setCurrentUser();
         router.push("/notes");
       }
     } catch (err: any) {
@@ -52,6 +57,13 @@ function Login() {
       setLoading(false);
     }
   }
+  // useEffect(() => {
+  //   const message = search.get("message");
+  //   if (message) {
+  //     toast(search.get("message"));
+  //     return;
+  //   }
+  // }, []);
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form
@@ -61,6 +73,9 @@ function Login() {
         <header className="px-1.5 py-1 flex flex-col relative">
           <h3 className="text-2xl font-semibold text-[#120C18]">LOG IN</h3>
           <small className="text-[#120C18]">Authenticate yourself</small>
+          <small className="text-red-500 text-[13px] absolute bottom-[-17px]">
+            {search.get("message") && search.get("message")}
+          </small>
         </header>
         <div className="pt-8 px-2 space-y-2">
           <div className="space-y-1 flex flex-col">
