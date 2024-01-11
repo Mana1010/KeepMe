@@ -9,22 +9,23 @@ export const protectedRoutes = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userToken = req.cookies["userToken"];
-  if (!userToken) {
+  const accessToken = req.headers["authorization"];
+  if (!accessToken) {
     req.user = null;
     next();
     return;
   }
   try {
+    const accessTokenParsed = accessToken.split(" ")[1];
     const token = jwt.verify(
-      userToken,
+      accessTokenParsed,
       process.env.ACCESS_TOKEN_KEY!
     ) as JwtPayload;
     req.user = await User.findById(token.id).select("-password");
     next();
   } catch (err) {
     req.user = null;
-    res.status(401);
+    res.status(401).json({ message: "Unauthorized" });
     next();
   }
 };

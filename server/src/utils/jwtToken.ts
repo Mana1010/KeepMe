@@ -7,6 +7,6 @@ export function createRefreshToken(id: string) {
 }
 export function createAccessToken(id: string) {
   return jwt.sign({ id }, process.env.ACCESS_TOKEN_KEY!, {
-    expiresIn: "30m",
+    expiresIn: process.env.NODE_ENV === "development" ? "10s" : "10m",
   });
 }

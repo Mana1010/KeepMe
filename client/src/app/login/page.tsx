@@ -36,10 +36,11 @@ function Login() {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      if (url.status === 201) {
+      if (url.status === 200) {
         toast.success(url.data.message, {
           position: matches ? "bottom-right" : "top-center",
         });
+        localStorage.setItem("userToken", url.data.token);
         reset();
         setCurrentUser();
         router.push("/notes");
@@ -57,13 +58,6 @@ function Login() {
       setLoading(false);
     }
   }
-  // useEffect(() => {
-  //   const message = search.get("message");
-  //   if (message) {
-  //     toast(search.get("message"));
-  //     return;
-  //   }
-  // }, []);
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form

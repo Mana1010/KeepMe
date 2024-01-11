@@ -14,7 +14,7 @@ function createRefreshToken(id) {
 exports.createRefreshToken = createRefreshToken;
 function createAccessToken(id) {
     return jsonwebtoken_1.default.sign({ id }, process.env.ACCESS_TOKEN_KEY, {
-        expiresIn: "30m",
+        expiresIn: process.env.NODE_ENV === "development" ? "10s" : "10m",
     });
 }
 exports.createAccessToken = createAccessToken;
