@@ -35,7 +35,7 @@ function ChangePassword() {
     try {
       setLoading(true);
       const url = await axios.post(
-        "http://localhost:5000/changepassword",
+        "http://localhost:5000/auth/changepassword",
         data,
         {
           headers: { "Content-Type": "application/json" },

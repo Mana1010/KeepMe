@@ -32,7 +32,7 @@ function Login() {
   async function formSubmit(data: Data) {
     try {
       setLoading(true);
-      const url = await axios.post("http://localhost:5000/login", data, {
+      const url = await axios.post("http://localhost:5000/auth/login", data, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

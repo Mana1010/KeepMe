@@ -16,12 +16,20 @@ const protectedRoutes = async (req, res, next) => {
     try {
         const accessTokenParsed = accessToken.split(" ")[1];
         const token = jsonwebtoken_1.default.verify(accessTokenParsed, process.env.ACCESS_TOKEN_KEY);
+        if (!token) {
+            throw new Error("Forbidden");
+        }
         req.user = await userModel_1.User.findById(token.id).select("-password");
         next();
     }
     catch (err) {
         req.user = null;
-        res.status(401).json({ message: "Unauthorized" });
+        if (err instanceof Error) {
+            res.status(403).json({ message: err.message });
+        }
+        else {
+            res.status(401).json({ message: "Unauthorized" });
+        }
         next();
     }
 };

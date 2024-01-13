@@ -12,8 +12,12 @@ const store = (set: any) => ({
     }));
   },
   setCurrentUser: async () => {
+    
     try {
-      const url = await axios.get("http://localhost:5000/verifyAccount", {
+      const url = await axios.get("http://localhost:5000/auth/verifyAccount", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
         withCredentials: true,
       });
       if (url.status === 200) {

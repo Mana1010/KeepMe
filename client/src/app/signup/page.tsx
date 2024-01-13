@@ -33,7 +33,7 @@ function Signup() {
   async function formSubmit(data: Data) {
     try {
       setLoading(true);
-      const url = await axios.post("http://localhost:5000/signup", data, {
+      const url = await axios.post("http://localhost:5000/auth/signup", data, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

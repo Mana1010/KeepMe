@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { User } from "../model/userModel";
-import { createAccessToken, createRefreshToken } from "../utils/jwtToken";
+import { createAccessToken, createRefreshToken } from "../utils/token";
 import bcrypt from "bcrypt";
-import { RequestExtend } from "../middleware/protectedRoutes";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
 export const getSignUp = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
   try {
@@ -46,7 +46,7 @@ export const getLogIn = async (req: Request, res: Response) => {
     res.status(401).json({ message: err.message });
   }
 };
-export const changePassword = async (req: RequestExtend, res: Response) => {
+export const changePassword = async (req: Request, res: Response) => {
   const { password, newpassword } = req.body;
   try {
     if (!req.user) {
@@ -68,7 +68,7 @@ export const changePassword = async (req: RequestExtend, res: Response) => {
     res.status(401).json({ message: err.message });
   }
 };
-export const verifyAccount = (req: RequestExtend, res: Response) => {
+export const verifyAccount = (req: Request, res: Response) => {
   if (req.user) {
     res.status(200).json({ message: req.user });
   } else {
@@ -76,7 +76,7 @@ export const verifyAccount = (req: RequestExtend, res: Response) => {
     res.status(401).json({ message: "Error" });
   }
 };
-export const newAccessToken = async (req: RequestExtend, res: Response) => {
+export const newAccessToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.jwt;
   try {
     if (!refreshToken) {

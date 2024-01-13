@@ -11,6 +11,8 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const authRoute_1 = __importDefault(require("./routes/authRoute"));
+const userRoute_1 = __importDefault(require("./routes/userRoute"));
+const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, helmet_1.default)());
@@ -20,7 +22,9 @@ app.use((0, cors_1.default)({
     origin: "http://localhost:3000",
     credentials: true,
 }));
-app.use("/", authRoute_1.default);
+app.use("/auth", authRoute_1.default);
+app.use("/user", userRoute_1.default);
+app.use(errorHandler_1.default);
 async function getDb() {
     try {
         await mongoose_1.default.connect(process.env.MONGO_URI);

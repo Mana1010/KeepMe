@@ -11,9 +11,6 @@ const authController_3 = require("../controller/authController");
 const router = express_1.default.Router();
 router.post("/signup", authController_1.getSignUp);
 router.post("/login", authController_1.getLogIn);
-router.get("/notes", protectedRoutes_1.protectedRoutes, (req, res) => {
-    console.log(req.user);
-});
 router.post("/changepassword", protectedRoutes_1.protectedRoutes, authController_2.changePassword);
 router.get("/verifyAccount", protectedRoutes_1.protectedRoutes, authController_3.verifyAccount);
 exports.default = router;

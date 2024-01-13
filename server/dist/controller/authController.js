@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.newAccessToken = exports.verifyAccount = exports.changePassword = exports.getLogIn = exports.getSignUp = void 0;
 const userModel_1 = require("../model/userModel");
-const jwtToken_1 = require("../utils/jwtToken");
+const token_1 = require("../utils/token");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const getSignUp = async (req, res) => {
@@ -33,8 +33,8 @@ const getLogIn = async (req, res) => {
         if (!findUser || !passwordCompare) {
             throw new Error("Opps! Wrong Credentials");
         }
-        const accessToken = (0, jwtToken_1.createAccessToken)(findUser?._id.toString());
-        const refreshToken = (0, jwtToken_1.createRefreshToken)(findUser?._id.toString());
+        const accessToken = (0, token_1.createAccessToken)(findUser?._id.toString());
+        const refreshToken = (0, token_1.createRefreshToken)(findUser?._id.toString());
         res
             .status(200)
             .cookie("refreshToken", refreshToken, {
@@ -95,7 +95,7 @@ const newAccessToken = async (req, res) => {
                 res.status(403).json({ message: "Forbidden" });
             }
             else {
-                const accessToken = (0, jwtToken_1.createAccessToken)(decoded.id.toString());
+                const accessToken = (0, token_1.createAccessToken)(decoded.id.toString());
             }
         });
     }

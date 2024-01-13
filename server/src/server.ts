@@ -5,7 +5,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
-import router from "./routes/authRoute";
+import authRoute from "./routes/authRoute";
+import userRoute from "./routes/userRoute";
+import errorHandler from "./middleware/errorHandler";
 const app = express();
 app.use(express.json());
 app.use(helmet());
@@ -17,7 +19,9 @@ app.use(
     credentials: true,
   })
 );
-app.use("/", router);
+app.use("/auth", authRoute);
+app.use("/user", userRoute);
+app.use(errorHandler);
 async function getDb() {
   try {
     await mongoose.connect(process.env.MONGO_URI as string);
