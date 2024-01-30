@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 interface User {
+  email?: string;
   username?: string;
   _id?: Types.ObjectId;
-  createdAt?: number;
 }
 
 declare global {

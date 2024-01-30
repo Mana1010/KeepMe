@@ -6,14 +6,9 @@ const router = express.Router();
 
 router.get(
   "/notes",
-  protectedRoutes as any,
+  protectedRoutes,
   async (req: Request, res: Response, next) => {
-    try {
-      res.status(400);
-      throw new Error("Lols");
-    } catch (err) {
-      next(err);
-    }
+    res.send("Welcome to Notes");
   }
 );
 

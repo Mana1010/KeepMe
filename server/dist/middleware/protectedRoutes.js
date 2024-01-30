@@ -6,30 +6,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.protectedRoutes = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = require("../model/userModel");
-const protectedRoutes = async (req, res, next) => {
+const protectedRoutes = (req, res, next) => {
     const accessToken = req.headers["authorization"];
-    if (!accessToken) {
-        req.user = null;
-        next();
-        return;
+    if (accessToken) {
+        const token = accessToken.split(" ")[1];
+        jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_KEY, async (err, decode) => {
+            if (err) {
+                return res.status(403).json({ message: "Forbidden" });
+            }
+            else {
+                const jwtPayload = decode;
+                req.user = await userModel_1.User.findById(jwtPayload.id).select("-password");
+                next();
+            }
+        });
     }
-    try {
-        const accessTokenParsed = accessToken.split(" ")[1];
-        const token = jsonwebtoken_1.default.verify(accessTokenParsed, process.env.ACCESS_TOKEN_KEY);
-        if (!token) {
-            throw new Error("Forbidden");
-        }
-        req.user = await userModel_1.User.findById(token.id).select("-password");
-        next();
-    }
-    catch (err) {
+    else {
         req.user = null;
-        if (err instanceof Error) {
-            res.status(403).json({ message: err.message });
-        }
-        else {
-            res.status(401).json({ message: "Unauthorized" });
-        }
         next();
     }
 };

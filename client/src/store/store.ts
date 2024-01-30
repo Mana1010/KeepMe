@@ -1,7 +1,14 @@
 import { create } from "zustand";
 import axios from "axios";
-interface State {
+export interface State {
   openNavBar: boolean;
+  currentUser: {
+    id: string;
+    email: string;
+    username: string;
+  } | null; // Include currentUser
+  setOpenNavbar: () => void;
+  setCurrentUser: () => Promise<void>;
 }
 const store = (set: any) => ({
   openNavBar: false,
@@ -12,9 +19,8 @@ const store = (set: any) => ({
     }));
   },
   setCurrentUser: async () => {
-    
     try {
-      const url = await axios.get("http://localhost:5000/auth/verifyAccount", {
+      const url = await axios.get("http://localhost:5000/auth/userDetails", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
@@ -24,7 +30,7 @@ const store = (set: any) => ({
         set({ currentUser: url.data.message });
       }
     } catch (err) {
-      console.error(err);
+      set({ currentUser: null });
     }
   },
 });

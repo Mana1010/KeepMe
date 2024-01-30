@@ -8,6 +8,7 @@ import morgan from "morgan";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import errorHandler from "./middleware/errorHandler";
+
 const app = express();
 app.use(express.json());
 app.use(helmet());

@@ -25,9 +25,7 @@ const userSchema = new mongoose_1.default.Schema({
             message: "Password must be greater than 8 characters long.",
         },
     },
-    createdAt: {
-        type: Date,
-        default: new Date(),
-    },
+}, {
+    timestamps: true,
 });
 exports.User = mongoose_1.default.model("users", userSchema);

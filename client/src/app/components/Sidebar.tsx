@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+import { useEffect, useState } from "react";
 import blackIcon from "./img/keepMe-lightmode.png";
 import Image from "next/image";
 import { FaXmark } from "react-icons/fa6";
@@ -8,15 +8,40 @@ import { FaHome } from "react-icons/fa";
 import { MdOutlineNotes, MdOutlineManageSearch } from "react-icons/md";
 import { MdFavorite, MdOutlinePersonAddAlt } from "react-icons/md";
 import { CiTrash, CiLogin } from "react-icons/ci";
-import { utilStore } from "../../store/store";
+import { utilStore } from "@/store/store";
 import { usePathname } from "next/navigation";
 import { TbArrowsExchange } from "react-icons/tb";
+import { State } from "@/store/store";
+import Skeleton from "@/components/ui/Skeleton";
 function Sidebar() {
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["user"],
+  //   queryFn: async () => {
+
+  //   }
+  // });
   const pathname = usePathname();
-  const { openNavBar, setOpenNavbar, currentUser } = utilStore();
+  const { openNavBar, setOpenNavbar, currentUser, setCurrentUser } =
+    utilStore() as State;
+  const [loading, isLoading] = useState(false);
+  // const { data, isLoading } = useUserDetails();
+  // console.log({ isLoading });
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        isLoading(true);
+        await setCurrentUser();
+      } catch (err) {
+        console.log(err);
+      } finally {
+        isLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
   return (
     <div
-      className={`absolute h-screen md:w-[250px] w-[40%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
+      className={`absolute h-screen md:w-[250px] w-[40%] md:static md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
         openNavBar ? "left-[0]" : "left-[-100%]"
       } md:left-[0] bg-white/40 backdrop-blur-md z-50`}
     >
@@ -147,11 +172,13 @@ function Sidebar() {
         </ul>
       </div>
       <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center">
-        <small className="text-[#120C18]">
-          {currentUser
-            ? `Hey, ${currentUser.username}`
-            : "You are not log in yet!"}
-        </small>
+        {loading ? (
+          <Skeleton />
+        ) : (
+          <small className="text-[#120C18]">
+            {currentUser?.email ? currentUser.email : "You are not login yet!"}
+          </small>
+        )}
       </footer>
     </div>
   );

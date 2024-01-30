@@ -10,6 +10,8 @@ import Link from "next/link";
 import { MdScheduleSend, MdSend } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { logIn, signUp } from "@/api/auth.api";
 export interface Data {
   email: string;
   username: string;
@@ -29,8 +31,22 @@ function Signup() {
       confirmpassword: "",
     },
   });
+
   const { errors } = formState;
+  const [user, setUserData] = useState({} as Data);
+  const mutate = useMutation({
+    mutationFn: async () => {
+      await signUp(user);
+    },
+    onSuccess: () => {
+      toast.success(mutate?.data as React.ReactNode, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+
   async function formSubmit(data: Data) {
+    setUserData(data);
     try {
       setLoading(true);
       const url = await axios.post("http://localhost:5000/auth/signup", data, {
@@ -38,9 +54,6 @@ function Signup() {
         withCredentials: true,
       });
       if (url.status === 201) {
-        toast.success(url.data.message, {
-          position: matches ? "bottom-right" : "top-center",
-        });
         reset();
       }
     } catch (err: any) {

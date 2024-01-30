@@ -34,11 +34,13 @@ function ChangePassword() {
   async function formSubmit(data: Data) {
     try {
       setLoading(true);
-      const url = await axios.post(
+      const url = await axios.patch(
         "http://localhost:5000/auth/changepassword",
         data,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
           withCredentials: true,
         }
       );

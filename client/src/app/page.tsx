@@ -1,16 +1,13 @@
 "use client";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import keepMeIcon from "./components/img/keepMe.png";
 import Link from "next/link";
 import { utilStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
-  const { setCurrentUser, currentUser } = utilStore();
-  useEffect(() => {
-    setCurrentUser();
-  }, []);
+  const { currentUser } = utilStore();
   return (
     <main className="grid grid-cols-1 md:grid-cols-2 items-center h-screen w-full px-4">
       <div className="flex flex-col w-full justify-center items-center">

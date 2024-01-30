@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
 const DMSans = DM_Sans({ subsets: ["latin"] });
 import { Suspense, lazy } from "react";
+import Provider from "./Provider";
 const Navbar = lazy(() => {
   return import("./components/Sidebar");
 });
@@ -21,14 +22,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${DMSans.className} flex`}>
-        <Suspense fallback={<h1>Loading.....</h1>}>
-          <Navbar />
-          <Header />
-          <NextTopLoader color="#120C18" shadow={false} />
-          {children}
-          <Toaster duration={3000} />
-        </Suspense>
+      <body>
+        <Provider>
+          <div className={`${DMSans.className} flex`}>
+            <Suspense fallback={<h1>Loading.....</h1>}>
+              <Navbar />
+              <Header />
+              <NextTopLoader color="#120C18" shadow={false} />
+              {children}
+              <Toaster duration={3000} />
+            </Suspense>
+          </div>
+        </Provider>
       </body>
     </html>
   );

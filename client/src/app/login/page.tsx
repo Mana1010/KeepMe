@@ -12,6 +12,7 @@ import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { utilStore } from "@/store/store";
+import { useMutation } from "@tanstack/react-query";
 interface Data {
   username: string;
   password: string;
@@ -77,6 +78,7 @@ function Login() {
               USERNAME
             </label>
             <input
+              disabled={loading}
               required
               {...register("username")}
               type="text"
@@ -93,6 +95,7 @@ function Login() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
+                disabled={loading}
                 required
                 type={showPassword ? "text" : "password"}
                 id="password"
