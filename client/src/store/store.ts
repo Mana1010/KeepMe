@@ -9,6 +9,7 @@ export interface State {
   } | null; // Include currentUser
   setOpenNavbar: () => void;
   setCurrentUser: () => Promise<void>;
+  logOut: () => void;
 }
 const store = (set: any) => ({
   openNavBar: false,
@@ -32,6 +33,18 @@ const store = (set: any) => ({
     } catch (err) {
       set({ currentUser: null });
     }
+  },
+  logOut: async () => {
+    await axios.post("http://localhost:5000/auth/logout", null, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      },
+      withCredentials: true,
+    });
+    set({
+      currentUser: null,
+    });
+    localStorage.removeItem("userToken");
   },
 });
 

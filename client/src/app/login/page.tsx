@@ -12,14 +12,13 @@ import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { utilStore } from "@/store/store";
-import { useMutation } from "@tanstack/react-query";
 interface Data {
   username: string;
   password: string;
 }
 function Login() {
   const search = useSearchParams();
-  const { setCurrentUser, currentUser } = utilStore();
+  const { setCurrentUser } = utilStore();
   const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);

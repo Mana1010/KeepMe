@@ -13,6 +13,9 @@ import { usePathname } from "next/navigation";
 import { TbArrowsExchange } from "react-icons/tb";
 import { State } from "@/store/store";
 import Skeleton from "@/components/ui/Skeleton";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useMediaQuery } from "usehooks-ts";
 function Sidebar() {
   // const { data, isLoading } = useQuery({
   //   queryKey: ["user"],
@@ -20,12 +23,12 @@ function Sidebar() {
 
   //   }
   // });
+  const router = useRouter();
   const pathname = usePathname();
-  const { openNavBar, setOpenNavbar, currentUser, setCurrentUser } =
+  const { openNavBar, setOpenNavbar, currentUser, setCurrentUser, logOut } =
     utilStore() as State;
   const [loading, isLoading] = useState(false);
-  // const { data, isLoading } = useUserDetails();
-  // console.log({ isLoading });
+  const matches = useMediaQuery("(min-width: 640px)");
   useEffect(() => {
     async function fetchData() {
       try {
@@ -39,9 +42,22 @@ function Sidebar() {
     }
     fetchData();
   }, []);
+  async function logOutMe() {
+    try {
+      logOut();
+      toast.success("Successfully Logout", {
+        position: matches ? "bottom-right" : "top-center",
+      });
+      router.push("/login");
+    } catch (err) {
+      toast.error("Successfully Logout", {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    }
+  }
   return (
     <div
-      className={`absolute h-screen md:w-[250px] w-[40%] md:static md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
+      className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:static md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
         openNavBar ? "left-[0]" : "left-[-100%]"
       } md:left-[0] bg-white/40 backdrop-blur-md z-50`}
     >
@@ -55,19 +71,6 @@ function Sidebar() {
           <FaXmark />
         </button>
       </header>
-      {pathname === "/notes" && (
-        <div className="w-[90%] rounded-sm bg-black/15 sm:flex items-center px-2 py-1 h-10 mx-auto mt-3 gap-2 hidden">
-          <button className="text-[#120C18] text-2xl">
-            <MdOutlineManageSearch />
-          </button>
-          <input
-            type="text"
-            name="searchbox"
-            placeholder="Search your Notes"
-            className="bg-transparent h-full outline-none text-[#120C18]"
-          />
-        </div>
-      )}
       <div className=" px-3.5 pt-2  text-[#120C18]">
         <small className="text-[#120C18]/80 text-[11px] font-extrabold">
           MAIN MENU
@@ -96,7 +99,7 @@ function Sidebar() {
                 {" "}
                 <MdOutlineNotes />
               </span>
-              <small>YOUR NOTES</small>
+              <small>MY NOTES</small>
             </div>
           </Link>
           <Link href={"/favorites"}>
@@ -171,13 +174,25 @@ function Sidebar() {
           </Link>
         </ul>
       </div>
-      <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center">
+      <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center flex-col items-center gap-2">
         {loading ? (
           <Skeleton />
         ) : (
           <small className="text-[#120C18]">
             {currentUser?.email ? currentUser.email : "You are not login yet!"}
           </small>
+        )}
+        {loading ? (
+          <Skeleton />
+        ) : (
+          currentUser && (
+            <button
+              onClick={logOutMe}
+              className="w-full bg-black text-white rounded-sm py-1.5 border-none flex gap-1 items-center justify-center"
+            >
+              LOGOUT
+            </button>
+          )
         )}
       </footer>
     </div>

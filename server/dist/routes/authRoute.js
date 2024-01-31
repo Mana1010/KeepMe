@@ -12,6 +12,6 @@ router.post("/signup", authController_1.getSignUp);
 router.post("/login", authController_1.getLogIn);
 router.get("/refresh", authController_2.newAccessToken);
 router.patch("/changepassword", protectedRoutes_1.protectedRoutes, authController_2.changePassword);
-router.post("/logout", authController_2.logOut);
+router.post("/logout", protectedRoutes_1.protectedRoutes, authController_2.logOut);
 router.get("/userDetails", protectedRoutes_1.protectedRoutes, authController_2.getUserDetails);
 exports.default = router;

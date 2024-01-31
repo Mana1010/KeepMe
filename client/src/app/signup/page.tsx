@@ -3,15 +3,13 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
-import { LuSendHorizonal } from "react-icons/lu";
 import signupIcon from "../components/img/signupIcon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { MdScheduleSend, MdSend } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { logIn, signUp } from "@/api/auth.api";
+import { useRouter } from "next/navigation";
 export interface Data {
   email: string;
   username: string;
@@ -19,6 +17,7 @@ export interface Data {
   confirmpassword: string;
 }
 function Signup() {
+  const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
@@ -34,16 +33,6 @@ function Signup() {
 
   const { errors } = formState;
   const [user, setUserData] = useState({} as Data);
-  const mutate = useMutation({
-    mutationFn: async () => {
-      await signUp(user);
-    },
-    onSuccess: () => {
-      toast.success(mutate?.data as React.ReactNode, {
-        position: matches ? "bottom-right" : "top-center",
-      });
-    },
-  });
 
   async function formSubmit(data: Data) {
     setUserData(data);
@@ -54,7 +43,11 @@ function Signup() {
         withCredentials: true,
       });
       if (url.status === 201) {
+        toast.success(url.data.message as React.ReactNode, {
+          position: matches ? "bottom-right" : "top-center",
+        });
         reset();
+        router.push("/login");
       }
     } catch (err: any) {
       toast.success(err.response.data.message, {
@@ -86,6 +79,7 @@ function Signup() {
               EMAIL ADDRESS
             </label>
             <input
+              disabled={loading}
               required
               {...register("email")}
               type="email"
@@ -101,6 +95,7 @@ function Signup() {
               USERNAME
             </label>
             <input
+              disabled={loading}
               required
               {...register("username")}
               type="text"
@@ -117,6 +112,7 @@ function Signup() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
+                disabled={loading}
                 required
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -155,6 +151,7 @@ function Signup() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
+                disabled={loading}
                 required
                 type={showConPassword ? "text" : "password"}
                 autoComplete="off"

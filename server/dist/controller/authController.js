@@ -99,15 +99,19 @@ exports.newAccessToken = (0, express_async_handler_1.default)(async (req, res) =
     });
 });
 exports.logOut = (0, express_async_handler_1.default)(async (req, res) => {
+    const cookie = req.cookies?.refreshToken;
+    if (!cookie) {
+        res.status(403);
+        throw new Error("Forbidden");
+    }
     res
+        .status(200)
         .clearCookie("refreshToken", {
         httpOnly: true,
         sameSite: "none",
         secure: true,
     })
-        .json({
-        message: "Logout successfully",
-    });
+        .json({ message: "Log out Successfully" });
 });
 exports.getUserDetails = (0, express_async_handler_1.default)(async (req, res) => {
     const getUser = await userModel_1.User.findById(req.user?._id)

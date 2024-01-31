@@ -12,7 +12,7 @@ router.post("/signup", getSignUp);
 router.post("/login", getLogIn);
 router.get("/refresh", newAccessToken);
 router.patch("/changepassword", protectedRoutes, changePassword);
-router.post("/logout", logOut);
+router.post("/logout", protectedRoutes, logOut);
 router.get("/userDetails", protectedRoutes, getUserDetails);
 
 export default router;

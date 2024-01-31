@@ -104,15 +104,19 @@ export const newAccessToken = asyncHandler(
 );
 
 export const logOut = asyncHandler(async (req: Request, res: Response) => {
+  const cookie = req.cookies?.refreshToken;
+  if (!cookie) {
+    res.status(403);
+    throw new Error("Forbidden");
+  }
   res
+    .status(200)
     .clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "none",
       secure: true,
     })
-    .json({
-      message: "Logout successfully",
-    });
+    .json({ message: "Log out Successfully" });
 });
 export const getUserDetails = asyncHandler(
   async (req: Request, res: Response) => {

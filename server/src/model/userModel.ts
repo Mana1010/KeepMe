@@ -1,8 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import { NextFunction } from "express";
-import { Document } from "mongoose";
-import { Schema } from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     email: {
