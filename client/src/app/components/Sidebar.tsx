@@ -57,7 +57,7 @@ function Sidebar() {
   }
   return (
     <div
-      className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:static md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
+      className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
         openNavBar ? "left-[0]" : "left-[-100%]"
       } md:left-[0] bg-white/40 backdrop-blur-md z-50`}
     >

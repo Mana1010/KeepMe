@@ -7,15 +7,11 @@ import { useRouter } from "next/navigation";
 import { utilStore } from "@/store/store";
 import { CiSearch } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa6";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+import { Tooltip } from "react-tooltip";
+import AddNote from "../components/Notes";
 function Notes() {
   const [openAlert, setOpenAlert] = useState(false);
+  const [addNote, setAddNote] = useState(false);
   const router = useRouter();
   const { setCurrentUser } = utilStore();
   useEffect(() => {
@@ -54,23 +50,19 @@ function Notes() {
           placeholder="Search your Notes"
           className="outline-none bg-transparent caret-black w-[95%]"
         />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              {" "}
-              <button className="absolute right-[20px] bottom-[20px] rounded-full w-[50px] h-[50px] bg-black flex justify-center items-center animate-bounce">
-                <span className="text-white">
-                  {" "}
-                  <FaPlus />
-                </span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="bottom-[-500px] right-[50px] w-[130px] absolute">
-              <p className="text-center">Add your Notes</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      </div>{" "}
+      <button
+        onClick={() => {
+          setAddNote((prev) => !prev);
+        }}
+        className="absolute right-[20px] bottom-[20px] rounded-full w-[50px] h-[50px] bg-black flex justify-center items-center animate-bounce"
+      >
+        <span className="text-white">
+          {" "}
+          <FaPlus />
+        </span>
+      </button>
+      {addNote && <AddNote setAddNote={setAddNote} />}
       {openAlert && <Alert />}
     </div>
   );
