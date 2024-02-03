@@ -9,6 +9,7 @@ import { CiSearch } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import AddNote from "../components/Notes";
+
 function Notes() {
   const [openAlert, setOpenAlert] = useState(false);
   const [addNote, setAddNote] = useState(false);

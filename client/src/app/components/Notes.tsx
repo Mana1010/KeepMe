@@ -3,7 +3,12 @@ import React, { SetStateAction, useState } from "react";
 import Image from "next/image";
 import keepMeIcon from "./img/keepMe-lightmode.png";
 import { LuPin, LuPinOff } from "react-icons/lu";
-import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
+import {
+  MdFavoriteBorder,
+  MdFavorite,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from "react-icons/md";
 import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
 import {
@@ -11,8 +16,7 @@ import {
   LiaListOlSolid,
   LiaListUlSolid,
 } from "react-icons/lia";
-import { useForm } from "react-hook-form";
-import { title } from "process";
+import { BsDot, BsCheck } from "react-icons/bs";
 interface Data {
   setAddNote: any;
 }
@@ -23,7 +27,8 @@ interface UserNote {
   isItalic: boolean;
   isFavorite: boolean;
   isPinned: boolean;
-  listType?: string;
+  isListOpen: boolean;
+  listType: string;
   bgColor: string;
 }
 function AddNote({ setAddNote }: Data) {
@@ -54,7 +59,24 @@ function AddNote({ setAddNote }: Data) {
     "#2E7AD2",
     "#125FBB",
   ];
-  const typeList = ["none", "dot", "number", "check"];
+  const [listNumber, setListNumber] = useState<number>(1);
+  const typeList = [
+    {
+      name: "dot",
+      icon: <LiaListUlSolid />,
+      symbol: ".",
+    },
+    {
+      name: "number",
+      icon: <LiaListOlSolid />,
+      symbol: listNumber,
+    },
+    {
+      name: "check",
+      icon: <LiaListAltSolid />,
+      symbol: "/",
+    },
+  ];
   const [note, setNote] = useState<UserNote>({
     title: "Untitled Note",
     content: "",
@@ -62,10 +84,13 @@ function AddNote({ setAddNote }: Data) {
     isItalic: false,
     isFavorite: false,
     isPinned: false,
+    isListOpen: false,
+    listType: "dot",
     bgColor: "white",
   });
   const [openBgColor, setOpenBgColor] = useState<boolean>(false);
   const [openListStyle, setOpenListStyle] = useState<boolean>(false);
+  const listFilter = typeList.find((type) => type.name === note.listType);
   function submitNote(
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement
@@ -100,9 +125,19 @@ function AddNote({ setAddNote }: Data) {
       listType: type,
     });
   }
+  function puttingListSymbol(e: any) {
+    const words = e.target.value.split("");
+    const filterSymbols = typeList.find((type) => type.name === note.listType);
+    if (e.key !== "Enter" || !note.isListOpen) {
+      return;
+    }
+  }
   return (
     <div
-      onClick={() => setOpenBgColor(false)}
+      onClick={() => {
+        setOpenBgColor(false);
+        setOpenListStyle(false);
+      }}
       className="absolute w-full h-screen flex justify-center items-center inset-0 backdrop-blur-lg z-50"
     >
       <form className="w-full md:w-[70%] lg:w-[50%] bg-white h-full md:h-[460px] absolute border-2 shadow-sm shadow-black px-2 py-2">
@@ -122,7 +157,7 @@ function AddNote({ setAddNote }: Data) {
                 e.stopPropagation(), setOpenBgColor((prev) => !prev);
               }}
               type="button"
-              className="text-xl flex gap-2 px-1.5 items-center border-[1px] border-slate-300 py-[0.1rem] rounded-lg relative"
+              className="text-xl flex gap-2 px-1.5 items-center shadow-md py-[0.1rem] rounded-lg relative"
             >
               <div
                 style={{ backgroundColor: note.bgColor }}
@@ -144,7 +179,7 @@ function AddNote({ setAddNote }: Data) {
                   type="button"
                   style={{ backgroundColor: colors }}
                   className={`md:w-4 md:h-4 w-6 h-6 rounded-full ${
-                    colors === "white" && "border-[1px] border-slate-300"
+                    colors === "white" && "border-[1px] border-slate-200"
                   }`}
                 ></button>
               ))}
@@ -160,7 +195,7 @@ function AddNote({ setAddNote }: Data) {
               type="button"
               className={`text-xl p-[2px] ${
                 note.isBold &&
-                "bg-slate-100 rounded-lg border-[1px] border-slate-300"
+                "bg-slate-100 rounded-lg border-[1px] border-slate-200"
               }`}
             >
               <TbBold />
@@ -176,35 +211,52 @@ function AddNote({ setAddNote }: Data) {
               type="button"
               className={`text-xl p-[2px] ${
                 note.isItalic &&
-                "bg-slate-100 rounded-lg border-[1px] border-slate-300"
+                "bg-slate-100 rounded-lg border-[1px] border-slate-200"
               }`}
             >
               <TbItalic />
             </button>
-            <button
-              type="button"
-              className={`text-xl p-[2px] ${
-                note.listType === "none" &&
-                "bg-slate-100 rounded-lg border-[1px] border-slate-300"
-              }`}
-            >
-              <LiaListOlSolid />
-            </button>
+            <div className="flex items-center shadow-md p-[0.2rem] gap-1">
+              <button
+                onClick={() =>
+                  setNote({ ...note, isListOpen: !note.isListOpen })
+                }
+                type="button"
+                className={`text-lg rounded-md ${
+                  note.isListOpen && "bg-slate-100 border-[1px]"
+                }`}
+              >
+                {listFilter?.icon}
+              </button>
+              <button
+                type="button"
+                className="shadow-md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openList();
+                }}
+              >
+                <MdKeyboardArrowDown />
+              </button>
+            </div>
+
             <div
-              className={`absolute top-[50px] right-2 w-[100px] p-1 flex justify-center items-center shadow-md rounded-sm z-10 bg-black ${
+              className={`absolute top-[50px] right-2 w-[100px] p-1 flex justify-center items-center shadow-md rounded-sm z-10 gap-2 ${
                 !openListStyle && "hidden"
               }`}
             >
               {typeList.map((type) => (
                 <button
-                  onMouseOver={() => listType(type)}
-                  onClick={() => listType(type)}
-                  key={type}
+                  onMouseOver={() => listType(type.name)}
+                  onClick={() => listType(type.name)}
+                  key={type.name}
                   type="button"
                   className={`md:w-4 md:h-4 w-6 h-6 rounded-full 
                    "border-[1px] border-slate-300"
                   `}
-                ></button>
+                >
+                  {type.icon}
+                </button>
               ))}
             </div>
           </div>
@@ -228,6 +280,7 @@ function AddNote({ setAddNote }: Data) {
                 fontWeight: note.isBold ? "900" : "500",
                 fontStyle: note.isItalic ? "italic" : "normal",
               }}
+              onKeyDown={puttingListSymbol}
               onChange={submitNote}
               name="content"
               value={note.content}
