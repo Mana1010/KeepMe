@@ -1,22 +1,12 @@
 "use client";
-import React, { SetStateAction, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import keepMeIcon from "./img/keepMe-lightmode.png";
-import { LuPin, LuPinOff } from "react-icons/lu";
-import {
-  MdFavoriteBorder,
-  MdFavorite,
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-} from "react-icons/md";
+import { LuPin } from "react-icons/lu";
+import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
 import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
-import {
-  LiaListAltSolid,
-  LiaListOlSolid,
-  LiaListUlSolid,
-} from "react-icons/lia";
-import { BsDot, BsCheck } from "react-icons/bs";
+import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
 interface Data {
   setAddNote: any;
 }
@@ -59,22 +49,16 @@ function AddNote({ setAddNote }: Data) {
     "#2E7AD2",
     "#125FBB",
   ];
-  const [listNumber, setListNumber] = useState<number>(1);
   const typeList = [
     {
       name: "dot",
       icon: <LiaListUlSolid />,
-      symbol: ".",
-    },
-    {
-      name: "number",
-      icon: <LiaListOlSolid />,
-      symbol: listNumber,
+      symbol: "●",
     },
     {
       name: "check",
       icon: <LiaListAltSolid />,
-      symbol: "/",
+      symbol: "✔",
     },
   ];
   const [note, setNote] = useState<UserNote>({
@@ -98,6 +82,7 @@ function AddNote({ setAddNote }: Data) {
   ) {
     e.preventDefault();
     const { value, name } = e.target;
+
     setNote({
       ...note,
       [name]: value,
@@ -126,12 +111,29 @@ function AddNote({ setAddNote }: Data) {
     });
   }
   function puttingListSymbol(e: any) {
-    const words = e.target.value.split("");
     const filterSymbols = typeList.find((type) => type.name === note.listType);
-    if (e.key !== "Enter" || !note.isListOpen) {
+    if (e.key === "Enter" && note.isListOpen) {
+      setNote({
+        ...note,
+        content: note.content + filterSymbols?.symbol + " ",
+      });
       return;
     }
   }
+  useEffect(() => {
+    const filterSymbols = typeList.find((type) => type.name === note.listType);
+    const removeDot = note.content.split("");
+    if (note.isListOpen && removeDot[0] !== filterSymbols?.symbol) {
+      if (filterSymbols?.name === note.listType) {
+        setNote({
+          ...note,
+          content: filterSymbols?.symbol + " " + note.content,
+        });
+      }
+    }
+    return;
+  }, [note.isListOpen]);
+
   return (
     <div
       onClick={() => {
@@ -276,11 +278,12 @@ function AddNote({ setAddNote }: Data) {
             className="shadow-lg w-full md:h-[250px] h-[68vh] rounded-sm p-2"
           >
             <textarea
+              id="textarea"
               style={{
                 fontWeight: note.isBold ? "900" : "500",
                 fontStyle: note.isItalic ? "italic" : "normal",
               }}
-              onKeyDown={puttingListSymbol}
+              onKeyUp={puttingListSymbol}
               onChange={submitNote}
               name="content"
               value={note.content}

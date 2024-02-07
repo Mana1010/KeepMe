@@ -17,12 +17,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
 function Sidebar() {
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ["user"],
-  //   queryFn: async () => {
-
-  //   }
-  // });
   const router = useRouter();
   const pathname = usePathname();
   const { openNavBar, setOpenNavbar, currentUser, setCurrentUser, logOut } =

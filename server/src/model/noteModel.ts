@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./userModel";
 const noteSchema = new mongoose.Schema(
   {
     title: String,
@@ -7,6 +6,18 @@ const noteSchema = new mongoose.Schema(
     isBold: {
       type: Boolean,
       default: false,
+    },
+    isItalic: {
+      type: Boolean,
+      default: false,
+    },
+    isListOpen: {
+      type: Boolean,
+      default: false,
+    },
+    listType: {
+      type: Boolean,
+      default: "dot",
     },
     isPinned: {
       type: Boolean,
@@ -20,9 +31,9 @@ const noteSchema = new mongoose.Schema(
       type: String,
       default: "white",
     },
-    user: {
+    createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: User,
+      ref: "User",
     },
   },
   {
@@ -30,4 +41,4 @@ const noteSchema = new mongoose.Schema(
   }
 );
 
-export const Notes = mongoose.model("users", noteSchema);
+export const Notes = mongoose.model("notes", noteSchema);
