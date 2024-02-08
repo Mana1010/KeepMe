@@ -9,7 +9,7 @@ import { CiSearch } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import AddNote from "../components/Notes";
-
+import { useQuery } from "@tanstack/react-query";
 function Notes() {
   const [openAlert, setOpenAlert] = useState(false);
   const [addNote, setAddNote] = useState(false);
@@ -34,6 +34,7 @@ function Notes() {
     }
     checkTokens();
   }, []);
+
   return (
     <div className="h-screen w-full px-4 py-2 relative">
       <h2 className="text-black text-[2.5rem] md:pt-0 pt-[35px] font-bold">

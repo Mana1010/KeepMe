@@ -12,12 +12,13 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
     content,
     isBold,
     isItalic,
+    isFavorite,
     isListOpen,
     listType,
     isPinned,
-    isFavorite,
     bgColor,
   } = req.body;
+  console.log(req.body);
   try {
     await Notes.create({
       title,
@@ -31,7 +32,6 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
       bgColor,
       createdBy: req.user._id,
     });
-
     res.status(201).json({ message: "Successfully add your note" });
   } catch (err) {
     res.status(400);

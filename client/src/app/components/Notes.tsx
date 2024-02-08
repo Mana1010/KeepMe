@@ -7,6 +7,9 @@ import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
 import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
 import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 interface Data {
   setAddNote: any;
 }
@@ -74,6 +77,40 @@ function AddNote({ setAddNote }: Data) {
   });
   const [openBgColor, setOpenBgColor] = useState<boolean>(false);
   const [openListStyle, setOpenListStyle] = useState<boolean>(false);
+  const mutateNote = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post(
+        "http://localhost:5000/user/notes",
+        note,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setAddNote((prev: boolean) => !prev);
+      setNote({
+        title: "Untitled Note",
+        content: "",
+        isBold: false,
+        isItalic: false,
+        isFavorite: false,
+        isPinned: false,
+        isListOpen: false,
+        listType: "dot",
+        bgColor: "white",
+      });
+    },
+    onError: (error: any) => {
+      console.log(error);
+      toast.error(error.response.data.message);
+    },
+  });
   const listFilter = typeList.find((type) => type.name === note.listType);
   function submitNote(
     e: React.ChangeEvent<
@@ -142,7 +179,13 @@ function AddNote({ setAddNote }: Data) {
       }}
       className="absolute w-full h-screen flex justify-center items-center inset-0 backdrop-blur-lg z-50"
     >
-      <form className="w-full md:w-[70%] lg:w-[50%] bg-white h-full md:h-[460px] absolute border-2 shadow-sm shadow-black px-2 py-2">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutateNote.mutate();
+        }}
+        className="w-full md:w-[70%] lg:w-[50%] bg-white h-full md:h-[460px] absolute border-2 shadow-sm shadow-black px-2 py-2"
+      >
         <header className="flex justify-between items-center py-2">
           <div>
             <Image width={80} src={keepMeIcon} alt="icon" priority />

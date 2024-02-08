@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 const noteSchema = new mongoose.Schema(
   {
     title: String,
@@ -16,7 +16,7 @@ const noteSchema = new mongoose.Schema(
       default: false,
     },
     listType: {
-      type: Boolean,
+      type: String,
       default: "dot",
     },
     isPinned: {
