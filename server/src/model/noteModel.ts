@@ -35,6 +35,10 @@ const noteSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
     },
+    owner: {
+      type: String,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

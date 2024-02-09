@@ -5,9 +5,23 @@ import keepMeIcon from "./components/img/keepMe.png";
 import Link from "next/link";
 import { utilStore } from "@/store/store";
 import { useRouter } from "next/navigation";
+import checkToken from "@/utils/checkToken";
 export default function Home() {
+  const { setCurrentUser } = utilStore();
   const router = useRouter();
   const { currentUser } = utilStore();
+  useEffect(() => {
+    async function checkTokens() {
+      const token = localStorage.getItem("userToken");
+      if (token) {
+        if (!(await checkToken())) {
+          setCurrentUser();
+          return;
+        }
+      }
+    }
+    checkTokens();
+  }, []);
   return (
     <main className="grid grid-cols-1 md:grid-cols-2 items-center h-screen w-full px-4">
       <div className="flex flex-col w-full justify-center items-center">

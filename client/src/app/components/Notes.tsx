@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import keepMeIcon from "./img/keepMe-lightmode.png";
 import { LuPin } from "react-icons/lu";
@@ -10,10 +10,12 @@ import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMediaQuery } from "usehooks-ts";
 interface Data {
   setAddNote: any;
 }
-interface UserNote {
+export interface UserNote {
   title: string;
   content: string;
   isBold: boolean;
@@ -75,8 +77,10 @@ function AddNote({ setAddNote }: Data) {
     listType: "dot",
     bgColor: "white",
   });
+  const matches = useMediaQuery("(min-width: 640px)");
   const [openBgColor, setOpenBgColor] = useState<boolean>(false);
   const [openListStyle, setOpenListStyle] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const mutateNote = useMutation({
     mutationFn: async () => {
       const response = await axios.post(
@@ -92,7 +96,10 @@ function AddNote({ setAddNote }: Data) {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      queryClient.invalidateQueries();
+      toast.success(data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
       setAddNote((prev: boolean) => !prev);
       setNote({
         title: "Untitled Note",
@@ -108,7 +115,9 @@ function AddNote({ setAddNote }: Data) {
     },
     onError: (error: any) => {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
     },
   });
   const listFilter = typeList.find((type) => type.name === note.listType);
@@ -124,6 +133,17 @@ function AddNote({ setAddNote }: Data) {
       ...note,
       [name]: value,
     });
+  }
+  const titleInput = useRef(null);
+  const contentInput = useRef<any>(null);
+  function handleKeyUp(
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    if (e.key === "Enter") {
+      if (e.target === titleInput.current) {
+        contentInput.current.focus();
+      }
+    }
   }
   function colorPickonMouseOver(color: string) {
     setNote({
@@ -161,12 +181,10 @@ function AddNote({ setAddNote }: Data) {
     const filterSymbols = typeList.find((type) => type.name === note.listType);
     const removeDot = note.content.split("");
     if (note.isListOpen && removeDot[0] !== filterSymbols?.symbol) {
-      if (filterSymbols?.name === note.listType) {
-        setNote({
-          ...note,
-          content: filterSymbols?.symbol + " " + note.content,
-        });
-      }
+      setNote({
+        ...note,
+        content: filterSymbols?.symbol + " " + note.content,
+      });
     }
     return;
   }, [note.isListOpen]);
@@ -310,7 +328,9 @@ function AddNote({ setAddNote }: Data) {
           <div className="shadow-md py-2.5 rounded-sm w-full flex space-x-2 px-2">
             <h4>TITLE:</h4>
             <input
+              onKeyUp={(e) => handleKeyUp(e)}
               onChange={submitNote}
+              ref={titleInput}
               name="title"
               value={note.title}
               className="w-full font-extrabold outline-none"
@@ -330,6 +350,7 @@ function AddNote({ setAddNote }: Data) {
               onChange={submitNote}
               name="content"
               value={note.content}
+              ref={contentInput}
               className="w-full resize-none h-full outline-none bg-transparent"
             ></textarea>
           </div>

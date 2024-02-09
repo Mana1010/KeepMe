@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FaXmark } from "react-icons/fa6";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
-import { MdOutlineNotes, MdOutlineManageSearch } from "react-icons/md";
+import { MdOutlineNotes } from "react-icons/md";
 import { MdFavorite, MdOutlinePersonAddAlt } from "react-icons/md";
 import { CiTrash, CiLogin } from "react-icons/ci";
 import { utilStore } from "@/store/store";
@@ -16,22 +16,26 @@ import Skeleton from "@/components/ui/Skeleton";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
+import axios from "axios";
+import { NoteData } from "../notes/page";
+import { useQuery } from "@tanstack/react-query";
+import { MdOutlineExposurePlus1 } from "react-icons/md";
 function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const { openNavBar, setOpenNavbar, currentUser, setCurrentUser, logOut } =
     utilStore() as State;
-  const [loading, isLoading] = useState(false);
+  const [loading, setIsLoading] = useState(false);
   const matches = useMediaQuery("(min-width: 640px)");
   useEffect(() => {
     async function fetchData() {
       try {
-        isLoading(true);
+        setIsLoading(true);
         await setCurrentUser();
       } catch (err) {
         console.log(err);
       } finally {
-        isLoading(false);
+        setIsLoading(false);
       }
     }
     fetchData();
@@ -49,6 +53,30 @@ function Sidebar() {
       });
     }
   }
+  const {
+    isError,
+    error,
+    isLoading,
+    isFetching,
+    data,
+  }: {
+    isError: boolean;
+    error: any;
+    isLoading: boolean;
+    isFetching: boolean;
+    data?: NoteData[];
+  } = useQuery({
+    queryKey: ["notes"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:5000/user/notes", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
+      return response.data.message;
+    },
+  });
   return (
     <div
       className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
@@ -85,15 +113,26 @@ function Sidebar() {
           </Link>
           <Link href={"/notes"}>
             <div
-              className={`flex gap-2 w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold ${
+              className={`flex gap-2 relative w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold justify-between ${
                 pathname === "/notes" && "bg-[#120C18] text-white"
               }`}
             >
-              <span>
-                {" "}
-                <MdOutlineNotes />
-              </span>
-              <small>MY NOTES</small>
+              <div className="flex gap-2">
+                <span>
+                  {" "}
+                  <MdOutlineNotes />
+                </span>
+                <small>MY NOTES</small>
+              </div>
+
+              <div>
+                <span
+                  className={`absolute top-[-15px] text-black font-semibold right-[5px]`}
+                >
+                  {<MdOutlineExposurePlus1 />}
+                </span>
+                <small className="font-semibold">{data?.length}</small>
+              </div>
             </div>
           </Link>
           <Link href={"/favorites"}>
