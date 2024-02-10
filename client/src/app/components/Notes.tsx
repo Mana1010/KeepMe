@@ -77,6 +77,7 @@ function AddNote({ setAddNote }: Data) {
     listType: "dot",
     bgColor: "white",
   });
+
   const matches = useMediaQuery("(min-width: 640px)");
   const [openBgColor, setOpenBgColor] = useState<boolean>(false);
   const [openListStyle, setOpenListStyle] = useState<boolean>(false);
@@ -114,7 +115,7 @@ function AddNote({ setAddNote }: Data) {
       });
     },
     onError: (error: any) => {
-      console.log(error);
+      toast.error("Please check your connection and try again");
       toast.error(error.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });

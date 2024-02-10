@@ -1,8 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 #notes::-webkit-scrollbar {
+  display: none;
+}
+#note-with-pin-container::-webkit-scrollbar {
   display: none;
 }
 /* :root {

@@ -12,7 +12,6 @@ import { utilStore } from "@/store/store";
 import { usePathname } from "next/navigation";
 import { TbArrowsExchange } from "react-icons/tb";
 import { State } from "@/store/store";
-import Skeleton from "@/components/ui/Skeleton";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
@@ -25,17 +24,13 @@ function Sidebar() {
   const pathname = usePathname();
   const { openNavBar, setOpenNavbar, currentUser, setCurrentUser, logOut } =
     utilStore() as State;
-  const [loading, setIsLoading] = useState(false);
   const matches = useMediaQuery("(min-width: 640px)");
   useEffect(() => {
     async function fetchData() {
       try {
-        setIsLoading(true);
         await setCurrentUser();
       } catch (err) {
         console.log(err);
-      } finally {
-        setIsLoading(false);
       }
     }
     fetchData();
@@ -48,16 +43,12 @@ function Sidebar() {
       });
       router.push("/login");
     } catch (err) {
-      toast.error("Successfully Logout", {
+      toast.error("Unsuccessfully Logout", {
         position: matches ? "bottom-right" : "top-center",
       });
     }
   }
   const {
-    isError,
-    error,
-    isLoading,
-    isFetching,
     data,
   }: {
     isError: boolean;
@@ -125,12 +116,12 @@ function Sidebar() {
                 <small>MY NOTES</small>
               </div>
 
-              <div>
-                <span
+              <div className={`${!currentUser && "hidden"} block`}>
+                {/* <span
                   className={`absolute top-[-15px] text-black font-semibold right-[5px]`}
                 >
                   {<MdOutlineExposurePlus1 />}
-                </span>
+                </span> */}
                 <small className="font-semibold">{data?.length}</small>
               </div>
             </div>
@@ -208,24 +199,16 @@ function Sidebar() {
         </ul>
       </div>
       <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center flex-col items-center gap-2">
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <small className="text-[#120C18]">
-            {currentUser?.email ? currentUser.email : "You are not login yet!"}
-          </small>
-        )}
-        {loading ? (
-          <Skeleton />
-        ) : (
-          currentUser && (
-            <button
-              onClick={logOutMe}
-              className="w-full bg-black text-white rounded-sm py-1.5 border-none flex gap-1 items-center justify-center"
-            >
-              LOGOUT
-            </button>
-          )
+        <small className="text-[#120C18]">
+          {currentUser?.email ? currentUser.email : "You are not login yet!"}
+        </small>
+        {currentUser && (
+          <button
+            onClick={logOutMe}
+            className="w-full bg-black text-white rounded-sm py-1.5 border-none flex gap-1 items-center justify-center"
+          >
+            LOGOUT
+          </button>
         )}
       </footer>
     </div>

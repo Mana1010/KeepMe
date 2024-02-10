@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Poppins } from "next/font/google";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Provider>
-          <div className={`${Montserrat_font.className} flex`}>
+          <div className={`${DMSans.className} flex`}>
             <Sidebar />
             <Header />
             <NextTopLoader color="#120C18" shadow={false} />
