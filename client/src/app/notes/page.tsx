@@ -12,11 +12,11 @@ import AddNote from "../components/Notes";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
-import { UserNote } from "../components/Notes";
+import { UserNote } from "@/store/note.store";
 import { TbNotes } from "react-icons/tb";
-import { RxDrawingPin } from "react-icons/rx";
+import { LuPin } from "react-icons/lu";
 import Loading from "@/components/ui/Loading";
-
+import { PiPushPinSlashLight } from "react-icons/pi";
 export interface NoteData extends UserNote {
   _id: string;
   createdBy: string;
@@ -126,7 +126,7 @@ function Notes() {
             id="note-with-pin-container"
             className={`${checkIsPinned && "overflow-y-auto"} w-full h-full`}
           >
-            <div className={`${!checkIsPinned && "hidden"} pt-2`}>
+            <div className={`${!checkIsPinned && "hidden"} p-2`}>
               <h6 className="font-semibold text-slate-700 text-[13px]">
                 PINNED
               </h6>
@@ -135,11 +135,11 @@ function Notes() {
                   <div
                     key={filteredNote._id}
                     style={{ backgroundColor: filteredNote.bgColor }}
-                    className="border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-4 py-2 relative"
+                    className="border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative"
                   >
-                    <span className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px]">
-                      <RxDrawingPin />
-                    </span>
+                    <button className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px]">
+                      <PiPushPinSlashLight />
+                    </button>
                     <header>
                       <h3 className="font-extrabold text-sm">
                         {filteredNote.title}
@@ -156,7 +156,7 @@ function Notes() {
                         }}
                         className="text-sm"
                       >
-                        {filteredNote.content.replace("/\n/g", "\n")}
+                        {filteredNote.content}
                       </p>
                     </div>
                   </div>
@@ -173,10 +173,13 @@ function Notes() {
                 <div
                   key={notes._id}
                   style={{ backgroundColor: notes.bgColor }}
-                  className="border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-4 py-2 "
+                  className="border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative"
                 >
-                  <header>
+                  <header className="flex justify-between items-center w-full">
                     <h3 className="font-extrabold text-sm">{notes.title}</h3>
+                    <button onClick={() => {}} className=" text-black">
+                      <LuPin />
+                    </button>
                   </header>
                   <div
                     style={{ overflowWrap: "break-word" }}
@@ -189,7 +192,7 @@ function Notes() {
                       }}
                       className="text-sm"
                     >
-                      {notes.content.replace("/\n/g", "\n")}
+                      {notes.content}
                     </p>
                   </div>
                 </div>

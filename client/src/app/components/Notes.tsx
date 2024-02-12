@@ -12,21 +12,31 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
+import { noteStore } from "@/store/note.store";
 interface Data {
   setAddNote: any;
 }
-export interface UserNote {
-  title: string;
-  content: string;
-  isBold: boolean;
-  isItalic: boolean;
-  isFavorite: boolean;
-  isPinned: boolean;
-  isListOpen: boolean;
-  listType: string;
-  bgColor: string;
-}
 function AddNote({ setAddNote }: Data) {
+  //For the state
+  const { note, openBg, openListStyle } = noteStore();
+
+  //For the setState and Function
+  const {
+    setNote,
+    resetNote,
+    colorPickonMouseOver,
+    colorPickOnClick,
+    listType,
+    setListSymbol,
+    removeDuplicateSymbols,
+    setOpenListStyle,
+    setOpenBg,
+    setBold,
+    setItalic,
+    setListOpen,
+    setOpenBgPropagate,
+    setOpenListStylePropagate,
+  } = noteStore();
   const bgColor = [
     "white",
     "#D9BCFC",
@@ -66,21 +76,7 @@ function AddNote({ setAddNote }: Data) {
       symbol: "✔",
     },
   ];
-  const [note, setNote] = useState<UserNote>({
-    title: "Untitled Note",
-    content: "",
-    isBold: false,
-    isItalic: false,
-    isFavorite: false,
-    isPinned: false,
-    isListOpen: false,
-    listType: "dot",
-    bgColor: "white",
-  });
-
   const matches = useMediaQuery("(min-width: 640px)");
-  const [openBgColor, setOpenBgColor] = useState<boolean>(false);
-  const [openListStyle, setOpenListStyle] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const mutateNote = useMutation({
     mutationFn: async () => {
@@ -101,18 +97,8 @@ function AddNote({ setAddNote }: Data) {
       toast.success(data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
+      resetNote();
       setAddNote((prev: boolean) => !prev);
-      setNote({
-        title: "Untitled Note",
-        content: "",
-        isBold: false,
-        isItalic: false,
-        isFavorite: false,
-        isPinned: false,
-        isListOpen: false,
-        listType: "dot",
-        bgColor: "white",
-      });
     },
     onError: (error: any) => {
       toast.error("Please check your connection and try again");
@@ -122,59 +108,11 @@ function AddNote({ setAddNote }: Data) {
     },
   });
   const listFilter = typeList.find((type) => type.name === note.listType);
-  function submitNote(
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement
-    >
-  ) {
-    e.preventDefault();
-    const { value, name } = e.target;
 
-    setNote({
-      ...note,
-      [name]: value,
-    });
-  }
-  const titleInput = useRef(null);
-  const contentInput = useRef<any>(null);
-  function handleKeyUp(
-    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    if (e.key === "Enter") {
-      if (e.target === titleInput.current) {
-        contentInput.current.focus();
-      }
-    }
-  }
-  function colorPickonMouseOver(color: string) {
-    setNote({
-      ...note,
-      bgColor: color,
-    });
-  }
-  function colorPickOnClick(color: string) {
-    setNote({
-      ...note,
-      bgColor: color,
-    });
-    setOpenBgColor((prev) => !prev);
-  }
-  function openList() {
-    setOpenListStyle((prev) => !prev);
-  }
-  function listType(type: string) {
-    setNote({
-      ...note,
-      listType: type,
-    });
-  }
   function puttingListSymbol(e: any) {
     const filterSymbols = typeList.find((type) => type.name === note.listType);
     if (e.key === "Enter" && note.isListOpen) {
-      setNote({
-        ...note,
-        content: note.content + filterSymbols?.symbol + " ",
-      });
+      setListSymbol(filterSymbols);
       return;
     }
   }
@@ -182,19 +120,16 @@ function AddNote({ setAddNote }: Data) {
     const filterSymbols = typeList.find((type) => type.name === note.listType);
     const removeDot = note.content.split("");
     if (note.isListOpen && removeDot[0] !== filterSymbols?.symbol) {
-      setNote({
-        ...note,
-        content: filterSymbols?.symbol + " " + note.content,
-      });
+      removeDuplicateSymbols(filterSymbols);
     }
     return;
   }, [note.isListOpen]);
-
+  console.log(note);
   return (
     <div
       onClick={() => {
-        setOpenBgColor(false);
-        setOpenListStyle(false);
+        setOpenBgPropagate();
+        setOpenListStylePropagate();
       }}
       className="absolute w-full h-screen flex justify-center items-center inset-0 backdrop-blur-lg z-50"
     >
@@ -218,7 +153,7 @@ function AddNote({ setAddNote }: Data) {
             </button>
             <button
               onClick={(e) => {
-                e.stopPropagation(), setOpenBgColor((prev) => !prev);
+                e.stopPropagation(), setOpenBg();
               }}
               type="button"
               className="text-xl flex gap-2 px-1.5 items-center shadow-md py-[0.1rem] rounded-lg relative"
@@ -232,13 +167,16 @@ function AddNote({ setAddNote }: Data) {
             </button>
             <div
               className={`absolute top-[50px] right-2 w-[200px] h-[150px] md:h-[100px] p-1 grid grid-cols-5 md:grid-cols-9 justify-center items-center bg-white shadow-md rounded-sm z-10 ${
-                !openBgColor && "hidden"
+                !openBg && "hidden"
               }`}
             >
               {bgColor.map((colors) => (
                 <button
                   onMouseOver={() => colorPickonMouseOver(colors)}
-                  onClick={() => colorPickOnClick(colors)}
+                  onClick={() => {
+                    colorPickOnClick(colors);
+                    setOpenBg();
+                  }}
                   key={colors}
                   type="button"
                   style={{ backgroundColor: colors }}
@@ -249,12 +187,7 @@ function AddNote({ setAddNote }: Data) {
               ))}
             </div>
             <button
-              onClick={() =>
-                setNote({
-                  ...note,
-                  isBold: !note.isBold,
-                })
-              }
+              onClick={setBold}
               name="isBold"
               type="button"
               className={`text-xl p-[2px] ${
@@ -265,12 +198,7 @@ function AddNote({ setAddNote }: Data) {
               <TbBold />
             </button>
             <button
-              onClick={() =>
-                setNote({
-                  ...note,
-                  isItalic: !note.isItalic,
-                })
-              }
+              onClick={setItalic}
               name="isItalic"
               type="button"
               className={`text-xl p-[2px] ${
@@ -282,9 +210,7 @@ function AddNote({ setAddNote }: Data) {
             </button>
             <div className="flex items-center shadow-md p-[0.2rem] gap-1">
               <button
-                onClick={() =>
-                  setNote({ ...note, isListOpen: !note.isListOpen })
-                }
+                onClick={setListOpen}
                 type="button"
                 className={`text-lg rounded-md ${
                   note.isListOpen && "bg-slate-100 border-[1px]"
@@ -297,7 +223,7 @@ function AddNote({ setAddNote }: Data) {
                 className="shadow-md"
                 onClick={(e) => {
                   e.stopPropagation();
-                  openList();
+                  setOpenListStyle();
                 }}
               >
                 <MdKeyboardArrowDown />
@@ -329,9 +255,7 @@ function AddNote({ setAddNote }: Data) {
           <div className="shadow-md py-2.5 rounded-sm w-full flex space-x-2 px-2">
             <h4>TITLE:</h4>
             <input
-              onKeyUp={(e) => handleKeyUp(e)}
-              onChange={submitNote}
-              ref={titleInput}
+              onChange={setNote}
               name="title"
               value={note.title}
               className="w-full font-extrabold outline-none"
@@ -348,10 +272,9 @@ function AddNote({ setAddNote }: Data) {
                 fontStyle: note.isItalic ? "italic" : "normal",
               }}
               onKeyUp={puttingListSymbol}
-              onChange={submitNote}
+              onChange={setNote}
               name="content"
               value={note.content}
-              ref={contentInput}
               className="w-full resize-none h-full outline-none bg-transparent"
             ></textarea>
           </div>

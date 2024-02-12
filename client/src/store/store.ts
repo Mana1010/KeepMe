@@ -1,15 +1,16 @@
 import { create } from "zustand";
 import axios from "axios";
+import React from "react";
 export interface State {
   openNavBar: boolean;
   currentUser: {
     id: string;
     email: string;
     username: string;
-  } | null; // Include currentUser
-  setOpenNavbar: () => void;
+  } | null;
   setCurrentUser: () => Promise<void>;
-  logOut: () => void;
+  setOpenNavbar: () => void;
+  logOut: () => Promise<void>;
 }
 const store = (set: any) => ({
   openNavBar: false,
