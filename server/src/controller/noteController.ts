@@ -50,3 +50,22 @@ export const getNotes = asyncHandler(async (req: Request, res: Response) => {
   }
   res.status(200).json({ message: userNote });
 });
+export const editNotes = asyncHandler(async (req: Request, res: Response) => {
+  const { _id, isPinned } = req.body;
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const findNote = await Notes.findById({ _id });
+  if (!findNote) {
+    res.status(404);
+    throw new Error("Note not found");
+  }
+  findNote.isPinned = isPinned;
+  await findNote.save();
+  if (isPinned) {
+    res.status(201).json({ message: "Successfully Pinned" });
+    return;
+  }
+  res.status(201).json({ message: "Successfully Unpinned" });
+});

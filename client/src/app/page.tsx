@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import keepMeIcon from "./components/img/keepMe.png";
 import Link from "next/link";
-import { utilStore } from "@/store/store";
+import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
 import checkToken from "@/utils/checkToken";
 export default function Home() {

@@ -29,6 +29,7 @@ export interface UserNoteStore extends StateNote {
   colorPickonMouseOver: (color: string) => void;
   colorPickOnClick: (color: string) => void;
   setOpenListStyle: () => void;
+  setPinned: () => void;
   setBold: () => void;
   setItalic: () => void;
   setOpenBg: () => void;
@@ -96,6 +97,14 @@ const store = (set: any) => ({
   },
   setOpenListStylePropagate: () => {
     set({ openListStyle: false });
+  },
+  setPinned: () => {
+    set((state: StateNote) => ({
+      note: {
+        ...state.note,
+        isPinned: !state.note.isPinned,
+      },
+    }));
   },
   setBold: () => {
     set((state: StateNote) => ({

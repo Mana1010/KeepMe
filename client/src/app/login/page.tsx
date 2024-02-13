@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { utilStore } from "@/store/store";
+import { utilStore } from "@/store/util.store";
 interface Data {
   username: string;
   password: string;
