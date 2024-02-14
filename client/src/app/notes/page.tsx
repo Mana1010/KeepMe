@@ -21,6 +21,20 @@ import Image from "next/image";
 import emptyNotes from "../components/img/emptyNote.png";
 import { useMediaQuery } from "usehooks-ts";
 import { motion } from "framer-motion";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FiTrash2, FiHeart } from "react-icons/fi";
+import { IoMdHeart, IoIosHeartEmpty } from "react-icons/io";
+import { MdOutlinePushPin } from "react-icons/md";
+import { MdOutlineHeartBroken } from "react-icons/md";
+
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
+
 export interface NoteData extends UserNote {
   _id: string;
   createdBy: string;
@@ -32,6 +46,7 @@ function Notes() {
   const matches = useMediaQuery("(min-width: 640px)");
   const [openAlert, setOpenAlert] = useState(false);
   const [addNote, setAddNote] = useState(false);
+  const [searchedNoteTitle, setSearchedNoteTitle] = useState<string | null>("");
   const router = useRouter();
   const { setCurrentUser } = utilStore();
   useEffect(() => {
@@ -109,6 +124,9 @@ function Notes() {
   if (isLoading) {
     return <Loading />;
   }
+  const searchedNotes: NoteData[] | undefined = data?.filter((note) =>
+    new RegExp(searchedNoteTitle as string, "i").test(note.title)
+  );
   const checkIsPinned = data?.some((user) => user.isPinned);
   const checkisUnpinned = data?.every((user) => user.isPinned);
   const filterNotePinned = data?.filter((user) => user.isPinned);
@@ -126,20 +144,26 @@ function Notes() {
           </div>
         </div>
       </div>
-      <div className="w-full rounded-md h-[45px] flex shadow shadow-black mt-2 gap-2 items-center px-2">
+      <div className="w-full rounded-md h-[45px] flex shadow shadow-black mt-2 gap-2 items-center px-2 relative z-10">
         <label htmlFor="search" className=" text-xl px-1">
           {" "}
           <CiSearch />
         </label>
         <input
-          autoComplete="false"
+          onChange={(e) => setSearchedNoteTitle(() => e.target.value)}
+          value={searchedNoteTitle as string}
+          autoComplete="off"
           id="search"
           type="text"
           placeholder="Search your Notes"
           className="outline-none bg-transparent caret-black w-[95%]"
         />
       </div>{" "}
-      <div className=" w-full h-[76%] md:h-[81%] pt-1">
+      <div
+        className={` w-full h-[76%] md:h-[82%] pt-1 ${
+          searchedNoteTitle ? "hidden" : "block"
+        }`}
+      >
         {data?.length === 0 ? (
           <div className="flex justify-center items-center flex-col w-full h-full space-y-2">
             <Image width={210} src={emptyNotes} alt="emptynote" priority />
@@ -177,18 +201,25 @@ function Notes() {
                       onClick={() => {
                         mutateNote.mutate(filteredNote);
                       }}
-                      className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px]"
+                      className="absolute w-6 h-6 rounded-full bg-black text-white md:flex justify-center items-center right-[-10px] top-[-7px] hidden"
                     >
                       <PiPushPinSlashLight />
                     </button>
+                    <span className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px] md:hidden">
+                      <PiPushPinSlashLight />
+                    </span>
                     <header>
                       <h3 className="font-extrabold text-sm">
                         {filteredNote.title}
                       </h3>
                     </header>
                     <div
-                      style={{ overflowWrap: "break-word" }}
-                      className=" pt-5 h-[93%] overflow-hidden"
+                      style={{
+                        overflowWrap: "break-word",
+                        fontWeight: filteredNote.isBold ? "900" : "normal",
+                        fontStyle: filteredNote.isItalic ? "italic" : "normal",
+                      }}
+                      className=" pt-5 h-[87%] overflow-hidden"
                     >
                       <p
                         style={{
@@ -200,6 +231,55 @@ function Notes() {
                         {filteredNote.content}
                       </p>
                     </div>
+                    <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
+                      <small>{filteredNote.createdAt.slice(0, 10)}</small>
+                      <div className="space-x-2">
+                        <button className="hidden md:inline">
+                          <FiHeart />
+                        </button>
+                        <button className="hidden md:inline">
+                          <FiTrash2 />
+                        </button>
+                      </div>
+                      <Menubar className="md:hidden flex">
+                        <MenubarMenu>
+                          <MenubarTrigger>
+                            <BsThreeDotsVertical />
+                          </MenubarTrigger>
+                          <MenubarContent className="bg-black text-white font-sans rounded-md divide-y-[1px] divide-[#27272A]">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => {
+                                mutateNote.mutate(filteredNote);
+                              }}
+                            >
+                              <span>
+                                <MdOutlinePushPin />
+                              </span>
+                              Unpin
+                            </MenubarItem>
+                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <span>
+                                {filteredNote.isFavorite ? (
+                                  <MdOutlineHeartBroken />
+                                ) : (
+                                  <IoIosHeartEmpty />
+                                )}
+                              </span>
+                              {filteredNote.isFavorite
+                                ? "Remove from Favorite"
+                                : "Add to Favorite"}
+                            </MenubarItem>
+                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <span>
+                                <FiTrash2 />
+                              </span>
+                              Delete
+                            </MenubarItem>
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                    </footer>
                   </motion.div>
                 ))}
               </div>
@@ -223,7 +303,7 @@ function Notes() {
                       onClick={() => {
                         mutateNote.mutate(notes);
                       }}
-                      className=" text-black"
+                      className=" text-black md:flex hidden"
                     >
                       <LuPin />
                     </button>
@@ -234,7 +314,7 @@ function Notes() {
                       fontWeight: notes.isBold ? "900" : "normal",
                       fontStyle: notes.isItalic ? "italic" : "normal",
                     }}
-                    className=" pt-5 h-[93%] overflow-hidden"
+                    className=" pt-5 h-[87%] overflow-hidden"
                   >
                     <p
                       style={{
@@ -246,11 +326,184 @@ function Notes() {
                       {notes.content}
                     </p>
                   </div>
+                  <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
+                    <small>{notes.createdAt.slice(0, 10)}</small>
+                    <div className="space-x-2">
+                      <button className="hidden md:inline">
+                        <FiHeart />
+                      </button>
+                      <button className="hidden md:inline">
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                    <Menubar className="md:hidden flex">
+                      <MenubarMenu>
+                        <MenubarTrigger>
+                          <BsThreeDotsVertical />
+                        </MenubarTrigger>
+                        <MenubarContent className="bg-black text-white font-sans rounded-md divide-y-[1px] divide-[#27272A]">
+                          <MenubarItem
+                            className="cursor-pointer font-primary p-2 flex gap-2"
+                            onClick={() => {
+                              mutateNote.mutate(notes);
+                            }}
+                          >
+                            <span>
+                              <MdOutlinePushPin />
+                            </span>
+                            Pin
+                          </MenubarItem>
+                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <span>
+                              {notes.isFavorite ? (
+                                <MdOutlineHeartBroken />
+                              ) : (
+                                <IoIosHeartEmpty />
+                              )}
+                            </span>
+                            {notes.isFavorite
+                              ? "Remove from Favorite"
+                              : "Add to Favorite"}
+                          </MenubarItem>
+                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <span>
+                              <FiTrash2 />
+                            </span>
+                            Delete
+                          </MenubarItem>
+                        </MenubarContent>
+                      </MenubarMenu>
+                    </Menubar>
+                  </footer>
                 </motion.div>
               ))}
             </div>
           </div>
         )}
+      </div>
+      {/* For Search Note Div */}
+      <div
+        id="searchNote-parent-container"
+        className={`${
+          searchedNoteTitle ? "block" : "hidden"
+        } overflow-y-auto w-full h-[76%] md:h-[82%]`}
+      >
+        <div className=" w-full h-full px-2.5">
+          <h6 className="font-semibold text-slate-700 text-[13px] pt-2">
+            RESULT NOTES
+          </h6>
+          <div
+            id="searchNote-container"
+            className="grid w-full h-full grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-1"
+          >
+            {searchedNotes?.map((notes: NoteData) => (
+              <motion.div
+                layout
+                key={notes._id}
+                style={{ backgroundColor: notes.bgColor }}
+                className={`border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative hover:shadow-xl shadow-black transition-shadow ease-in duration-200 `}
+              >
+                <header className="flex justify-between items-center w-full">
+                  <h3 className="font-extrabold text-sm">{notes.title}</h3>
+                  <button
+                    onClick={() => {
+                      mutateNote.mutate(notes);
+                    }}
+                    className={`text-black ${
+                      notes.isPinned ? "hidden" : "md:flex"
+                    }`}
+                  >
+                    <LuPin />
+                  </button>
+                  <button
+                    onClick={() => {
+                      mutateNote.mutate(notes);
+                    }}
+                    className={`absolute w-6 h-6 rounded-full bg-black text-white justify-center items-center right-[-10px] top-[-7px] hidden ${
+                      !notes.isPinned ? "hidden" : "md:flex"
+                    }`}
+                  >
+                    <PiPushPinSlashLight />
+                  </button>
+                  <span
+                    className={`absolute w-6 h-6 rounded-full bg-black text-white justify-center items-center right-[-10px] top-[-7px] md:hidden ${
+                      notes.isPinned ? "flex" : "hidden"
+                    }`}
+                  >
+                    <PiPushPinSlashLight />
+                  </span>
+                </header>
+                <div
+                  style={{
+                    overflowWrap: "break-word",
+                    fontWeight: notes.isBold ? "900" : "normal",
+                    fontStyle: notes.isItalic ? "italic" : "normal",
+                  }}
+                  className=" pt-5 h-[87%] overflow-hidden"
+                >
+                  <p
+                    style={{
+                      whiteSpace: "pre-line",
+                      fontWeight: notes.isBold ? "bold" : "normal",
+                    }}
+                    className="text-sm"
+                  >
+                    {notes.content}
+                  </p>
+                </div>
+                <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
+                  <small>{notes.createdAt.slice(0, 10)}</small>
+                  <div className="space-x-2">
+                    <button className="hidden md:inline">
+                      <FiHeart />
+                    </button>
+                    <button className="hidden md:inline">
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                  <Menubar className="md:hidden flex">
+                    <MenubarMenu>
+                      <MenubarTrigger>
+                        <BsThreeDotsVertical />
+                      </MenubarTrigger>
+                      <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
+                        <MenubarItem
+                          className="cursor-pointer font-primary p-2 flex gap-2"
+                          onClick={() => {
+                            mutateNote.mutate(notes);
+                          }}
+                        >
+                          <span>
+                            <MdOutlinePushPin />
+                          </span>
+                          {notes.isPinned ? "Unpin" : "Pin"}
+                        </MenubarItem>
+                        <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                          <span>
+                            {notes.isFavorite ? (
+                              <MdOutlineHeartBroken />
+                            ) : (
+                              <IoIosHeartEmpty />
+                            )}
+                          </span>
+                          {notes.isFavorite
+                            ? "Remove from Favorite"
+                            : "Add to Favorite"}
+                        </MenubarItem>
+                        <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                          <span>
+                            <FiTrash2 />
+                          </span>
+                          Delete
+                        </MenubarItem>
+                      </MenubarContent>
+                    </MenubarMenu>
+                  </Menubar>
+                </footer>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
       <button
         onClick={() => {

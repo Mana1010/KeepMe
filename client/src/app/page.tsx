@@ -28,8 +28,8 @@ export default function Home() {
         <h1 className="text-[#120C18] font-extrabold md:text-[5rem] text-[4rem]">
           KeepMe
         </h1>
-        <p className="text-lg italic text-[#120C18]">
-          Capture. Organize. Create.
+        <p className="text-lg italic text-[#120C18] text-center">
+          Effortless Note-taking, Anytime, Anywhere with KeepMe.
         </p>
         <button
           className="mt-2 w-[70%] text-white bg-[#120C18] h-[45px]"

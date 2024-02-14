@@ -60,6 +60,7 @@ function Signup() {
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form
+        autoComplete="off"
         className="w-full h-[530px] md:w-[70%] shadow-sm shadow-[#120C18] rounded-sm p-2"
         onSubmit={handleSubmit(formSubmit)}
       >
