@@ -105,7 +105,7 @@ function Sidebar() {
           <Link href={"/notes"}>
             <div
               className={`flex gap-2 relative w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold justify-between ${
-                pathname === "/notes" && "bg-[#120C18] text-white"
+                pathname.startsWith("/notes") && "bg-[#120C18] text-white"
               }`}
             >
               <div className="flex gap-2">

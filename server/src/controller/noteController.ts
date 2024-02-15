@@ -64,8 +64,16 @@ export const editNotes = asyncHandler(async (req: Request, res: Response) => {
   findNote.isPinned = isPinned;
   await findNote.save();
   if (isPinned) {
-    res.status(201).json({ message: "Successfully Pinned" });
+    res.status(201).json({ message: "Note successfully pinned." });
     return;
   }
-  res.status(201).json({ message: "Successfully Unpinned" });
+  res.status(201).json({ message: "Note successfully unpinned." });
+});
+export const editNote = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const editNote = await Notes.findById(id);
+  if (!editNote) {
+    res.status(200).json({ message: [] });
+    return;
+  }
 });

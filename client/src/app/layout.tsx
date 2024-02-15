@@ -28,7 +28,7 @@ export default function RootLayout({
             <Header />
             <NextTopLoader color="#120C18" shadow={false} />
             {children}
-            <Toaster duration={3000} />
+            <Toaster duration={1500} theme="system" />
           </div>
         </Provider>
       </body>
