@@ -44,5 +44,13 @@ const noteSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+noteSchema.pre("save", function (next) {
+  if (this.isModified("title") || this.isModified("content")) {
+    console.log("Updated", this);
+    next();
+  }
+  console.log("Not updated");
+  next();
+});
 
 export const Notes = mongoose.model("notes", noteSchema);

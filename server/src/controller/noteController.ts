@@ -51,29 +51,80 @@ export const getNotes = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json({ message: userNote });
 });
 export const editNotes = asyncHandler(async (req: Request, res: Response) => {
-  const { _id, isPinned } = req.body;
+  const { id } = req.params;
+  const {
+    title,
+    content,
+    isBold,
+    isItalic,
+    isListOpen,
+    listType,
+    isPinned,
+    isFavorite,
+    bgColor,
+  } = req.body;
   if (!req.user) {
     res.status(401);
     throw new Error("Unauthorized");
   }
-  const findNote = await Notes.findById({ _id });
-  if (!findNote) {
+  const editNote = await Notes.findById(id);
+  if (!editNote) {
     res.status(404);
     throw new Error("Note not found");
   }
-  findNote.isPinned = isPinned;
-  await findNote.save();
-  if (isPinned) {
-    res.status(201).json({ message: "Note successfully pinned." });
-    return;
-  }
-  res.status(201).json({ message: "Note successfully unpinned." });
+  editNote.title = title;
+  editNote.content = content;
+  editNote.isBold = isBold;
+  editNote.isItalic = isItalic;
+  editNote.isFavorite = isFavorite;
+  editNote.isListOpen = isListOpen;
+  editNote.listType = listType;
+  editNote.isPinned = isPinned;
+  editNote.bgColor = bgColor;
+  await editNote.save();
+  res.status(200).json({ message: "Successfully updated your note." });
 });
-export const editNote = asyncHandler(async (req: Request, res: Response) => {
+export const editNotePin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const editNote = await Notes.findById(id);
-  if (!editNote) {
-    res.status(200).json({ message: [] });
+  const { isPinned } = req.body;
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const editNotePin = await Notes.findById(id);
+  if (!editNotePin) {
+    res.status(404);
+    throw new Error("Note is not found");
+  }
+  editNotePin.isPinned = isPinned;
+  await editNotePin.save();
+  if (isPinned) {
+    res.status(200).json({ message: "Note successfully pinned." });
     return;
   }
+  res.status(200).json({ message: "Note successfully unpinned." });
 });
+export const editNoteFavorite = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { isFavorite } = req.body;
+    if (!req.user) {
+      res.status(401);
+      throw new Error("Unauthorized");
+    }
+    const editNoteFavorite = await Notes.findById(id);
+    if (!editNoteFavorite) {
+      res.status(404);
+      throw new Error("Note is not found");
+    }
+    editNoteFavorite.isFavorite = isFavorite;
+    await editNoteFavorite.save();
+    if (isFavorite) {
+      res.status(200).json({ message: "Note successfully add to Favorites." });
+      return;
+    }
+    res
+      .status(200)
+      .json({ message: "Note successfully remove from Favorites." });
+  }
+);

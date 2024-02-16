@@ -47,9 +47,7 @@ function Notes() {
   const matches = useMediaQuery("(min-width: 640px)");
   const [openAlert, setOpenAlert] = useState(false);
   const [addNote, setAddNote] = useState(false);
-  const [searchedNoteTitle, setSearchedNoteTitle] = useState<any>(
-    JSON.parse(localStorage.getItem("searchNote") || "")
-  );
+  const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
   const { setCurrentUser } = utilStore();
   useEffect(() => {
@@ -95,11 +93,37 @@ function Notes() {
     },
   });
   const queryClient = useQueryClient();
-  const mutateNote = useMutation({
+  const mutatePinNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axios.patch(
-        "http://localhost:5000/user/notes",
-        { isPinned: !data.isPinned, _id: data._id },
+        `http://localhost:5000/user/notes/pin/${data._id}`,
+        { isPinned: !data.isPinned },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries();
+      toast.success(data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+  const mutateFavoriteNote = useMutation({
+    mutationFn: async (data: NoteData) => {
+      const response = await axios.patch(
+        `http://localhost:5000/user/notes/favorite/${data._id}`,
+        { isFavorite: !data.isFavorite },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
@@ -154,8 +178,7 @@ function Notes() {
         </label>
         <input
           onChange={(e) => {
-            setSearchedNoteTitle(e.target.value);
-            localStorage.setItem("searchNote", JSON.stringify(e.target.value));
+            setSearchedNoteTitle((prev) => e.target.value);
           }}
           value={searchedNoteTitle as string}
           autoComplete="off"
@@ -199,20 +222,27 @@ function Notes() {
               <div className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-3 pt-1 relative">
                 {filterNotePinned?.map((filteredNote) => (
                   <motion.div
+                    onClick={() => {
+                      router.push(`notes/${filteredNote._id}`);
+                    }}
                     layout
                     key={filteredNote._id}
                     style={{ backgroundColor: filteredNote.bgColor }}
                     className={`border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative hover:shadow-xl shadow-black transition-shadow ease-in duration-200`}
                   >
                     <button
-                      onClick={() => {
-                        mutateNote.mutate(filteredNote);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutatePinNote.mutate(filteredNote);
                       }}
                       className="absolute w-6 h-6 rounded-full bg-black text-white md:flex justify-center items-center right-[-10px] top-[-7px] hidden"
                     >
                       <PiPushPinSlashLight />
                     </button>
-                    <span className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px] md:hidden">
+                    <span
+                      className="absolute w-6 h-6 rounded-full bg-black text-white flex justify-center items-center right-[-10px] top-[-7px] md:hidden"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <PiPushPinSlashLight />
                     </span>
                     <header>
@@ -240,32 +270,54 @@ function Notes() {
                     </div>
                     <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
                       <small>{filteredNote.createdAt.slice(0, 10)}</small>
-                      <div className="space-x-2">
-                        <button className="hidden md:inline">
-                          <FiHeart />
+                      <div
+                        className="space-x-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          className={`hidden md:inline ${
+                            filteredNote.isFavorite
+                              ? "text-red-500"
+                              : "text-black"
+                          }`}
+                          onClick={() => {
+                            mutateFavoriteNote.mutate(filteredNote);
+                          }}
+                        >
+                          {filteredNote.isFavorite ? (
+                            <IoMdHeart />
+                          ) : (
+                            <FiHeart />
+                          )}
                         </button>
                         <button className="hidden md:inline">
                           <FiTrash2 />
                         </button>
                       </div>
-                      <Menubar className="md:hidden flex">
+                      <Menubar
+                        className="md:hidden flex"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <MenubarMenu>
                           <MenubarTrigger>
                             <BsThreeDotsVertical />
                           </MenubarTrigger>
-                          <MenubarContent className="bg-black text-white font-sans rounded-md divide-y-[1px] divide-[#27272A]">
+                          <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
                             <MenubarItem
                               className="cursor-pointer font-primary p-2 flex gap-2"
-                              onClick={() => {
-                                mutateNote.mutate(filteredNote);
-                              }}
+                              onClick={() => mutatePinNote.mutate(filteredNote)}
                             >
                               <span>
                                 <MdOutlinePushPin />
                               </span>
-                              Unpin
+                              {filteredNote.isPinned ? "Unpin" : "Pin"}
                             </MenubarItem>
-                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => {
+                                mutateFavoriteNote.mutate(filteredNote);
+                              }}
+                            >
                               <span>
                                 {filteredNote.isFavorite ? (
                                   <MdOutlineHeartBroken />
@@ -274,8 +326,8 @@ function Notes() {
                                 )}
                               </span>
                               {filteredNote.isFavorite
-                                ? "Remove from Favorite"
-                                : "Add to Favorite"}
+                                ? "Remove from Favorites"
+                                : "Add to Favorites"}
                             </MenubarItem>
                             <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
                               <span>
@@ -300,6 +352,9 @@ function Notes() {
             >
               {filteredNotenotPinned?.map((notes: NoteData) => (
                 <motion.div
+                  onClick={() => {
+                    router.push(`notes/${notes._id}`);
+                  }}
                   layout
                   key={notes._id}
                   style={{ backgroundColor: notes.bgColor }}
@@ -308,8 +363,9 @@ function Notes() {
                   <header className="flex justify-between items-center w-full">
                     <h3 className="font-extrabold text-sm">{notes.title}</h3>
                     <button
-                      onClick={() => {
-                        mutateNote.mutate(notes);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutatePinNote.mutate(notes);
                       }}
                       className=" text-black md:flex hidden"
                     >
@@ -336,32 +392,48 @@ function Notes() {
                   </div>
                   <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
                     <small>{notes.createdAt.slice(0, 10)}</small>
-                    <div className="space-x-2">
-                      <button className="hidden md:inline">
-                        <FiHeart />
+                    <div
+                      className="space-x-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className={`hidden md:inline ${
+                          notes.isFavorite ? "text-red-500" : "text-black"
+                        }`}
+                        onClick={() => mutateFavoriteNote.mutate(notes)}
+                      >
+                        {notes.isFavorite ? <IoMdHeart /> : <FiHeart />}
                       </button>
                       <button className="hidden md:inline">
                         <FiTrash2 />
                       </button>
                     </div>
-                    <Menubar className="md:hidden flex">
+                    <Menubar
+                      className="md:hidden flex"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MenubarMenu>
                         <MenubarTrigger>
                           <BsThreeDotsVertical />
                         </MenubarTrigger>
-                        <MenubarContent className="bg-black text-white font-sans rounded-md divide-y-[1px] divide-[#27272A]">
+                        <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
                           <MenubarItem
                             className="cursor-pointer font-primary p-2 flex gap-2"
                             onClick={() => {
-                              mutateNote.mutate(notes);
+                              mutatePinNote.mutate(notes);
                             }}
                           >
                             <span>
                               <MdOutlinePushPin />
                             </span>
-                            Pin
+                            {notes.isPinned ? "Unpin" : "Pin"}
                           </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                          <MenubarItem
+                            className="cursor-pointer font-primary p-2 flex gap-2"
+                            onClick={(e) => {
+                              mutateFavoriteNote.mutate(notes);
+                            }}
+                          >
                             <span>
                               {notes.isFavorite ? (
                                 <MdOutlineHeartBroken />
@@ -370,8 +442,8 @@ function Notes() {
                               )}
                             </span>
                             {notes.isFavorite
-                              ? "Remove from Favorite"
-                              : "Add to Favorite"}
+                              ? "Remove from Favorites"
+                              : "Add to Favorites"}
                           </MenubarItem>
                           <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
                             <span>
@@ -426,8 +498,9 @@ function Notes() {
                   <header className="flex justify-between items-center w-full">
                     <h3 className="font-extrabold text-sm">{notes.title}</h3>
                     <button
-                      onClick={() => {
-                        mutateNote.mutate(notes);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutatePinNote.mutate(notes);
                       }}
                       className={`text-black ${
                         notes.isPinned ? "hidden" : "md:flex"
@@ -436,8 +509,9 @@ function Notes() {
                       <LuPin />
                     </button>
                     <button
-                      onClick={() => {
-                        mutateNote.mutate(notes);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutatePinNote.mutate(notes);
                       }}
                       className={`absolute w-6 h-6 rounded-full bg-black text-white justify-center items-center right-[-10px] top-[-7px] hidden ${
                         !notes.isPinned ? "hidden" : "md:flex"
@@ -446,6 +520,9 @@ function Notes() {
                       <PiPushPinSlashLight />
                     </button>
                     <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
                       className={`absolute w-6 h-6 rounded-full bg-black text-white justify-center items-center right-[-10px] top-[-7px] md:hidden ${
                         notes.isPinned ? "flex" : "hidden"
                       }`}
@@ -474,14 +551,22 @@ function Notes() {
                   <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
                     <small>{notes.createdAt.slice(0, 10)}</small>
                     <div className="space-x-2">
-                      <button className="hidden md:inline">
-                        <FiHeart />
+                      <button
+                        className={`hidden md:inline ${
+                          notes.isFavorite ? "text-red-500" : "text-black"
+                        }`}
+                        onClick={() => mutateFavoriteNote.mutate(notes)}
+                      >
+                        {notes.isFavorite ? <IoMdHeart /> : <FiHeart />}
                       </button>
                       <button className="hidden md:inline">
                         <FiTrash2 />
                       </button>
                     </div>
-                    <Menubar className="md:hidden flex">
+                    <Menubar
+                      className="md:hidden flex"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MenubarMenu>
                         <MenubarTrigger>
                           <BsThreeDotsVertical />
@@ -490,7 +575,7 @@ function Notes() {
                           <MenubarItem
                             className="cursor-pointer font-primary p-2 flex gap-2"
                             onClick={() => {
-                              mutateNote.mutate(notes);
+                              mutatePinNote.mutate(notes);
                             }}
                           >
                             <span>
@@ -498,7 +583,12 @@ function Notes() {
                             </span>
                             {notes.isPinned ? "Unpin" : "Pin"}
                           </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                          <MenubarItem
+                            className="cursor-pointer font-primary p-2 flex gap-2"
+                            onClick={(e) => {
+                              mutateFavoriteNote.mutate(notes);
+                            }}
+                          >
                             <span>
                               {notes.isFavorite ? (
                                 <MdOutlineHeartBroken />
@@ -507,8 +597,8 @@ function Notes() {
                               )}
                             </span>
                             {notes.isFavorite
-                              ? "Remove from Favorite"
-                              : "Add to Favorite"}
+                              ? "Remove from Favorites"
+                              : "Add to Favorites"}
                           </MenubarItem>
                           <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
                             <span>
