@@ -11,7 +11,7 @@ import { Tooltip } from "react-tooltip";
 import AddNote from "../components/Notes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
+import { toast as toaster } from "sonner";
 import { UserNote } from "@/store/note.store";
 import { TbNotes } from "react-icons/tb";
 import { LuPin } from "react-icons/lu";
@@ -27,6 +27,8 @@ import { IoMdHeart, IoIosHeartEmpty } from "react-icons/io";
 import { MdOutlinePushPin } from "react-icons/md";
 import { MdOutlineHeartBroken } from "react-icons/md";
 import noResult from "../components/img/no-result-found.png";
+import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   Menubar,
@@ -49,7 +51,9 @@ function Notes() {
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
+  const { toast } = useToast();
   const { setCurrentUser } = utilStore();
+  console.log(new Date());
   useEffect(() => {
     async function checkTokens() {
       const token = localStorage.getItem("userToken");
@@ -109,12 +113,12 @@ function Notes() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries();
-      toast.success(data.message, {
+      toaster.success(data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message, {
+      toaster.error(error.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     },
@@ -135,18 +139,18 @@ function Notes() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries();
-      toast.success(data.message, {
+      toaster.success(data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message, {
+      toaster.error(error.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     },
   });
   if (isError) {
-    toast.error(error.response.data.message);
+    toaster.error(error.response.data.message);
   }
   if (isLoading) {
     return <Loading />;
@@ -158,6 +162,15 @@ function Notes() {
   const checkisUnpinned = data?.every((user) => user.isPinned);
   const filterNotePinned = data?.filter((user) => user.isPinned);
   const filteredNotenotPinned = data?.filter((user) => !user.isPinned);
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZone: "UTC",
+  });
   return (
     <div className="h-screen w-full px-4 py-2 relative">
       <div className="flex justify-between items-center w-full md:pt-0 pt-[35px]">
@@ -293,6 +306,21 @@ function Notes() {
                         <button className="hidden md:inline">
                           <FiTrash2 />
                         </button>
+                        <button
+                          className="hidden md:inline"
+                          onClick={() => {
+                            toast({
+                              title: "Note Details",
+                              description: `Created At: ${dateFormatter.format(
+                                new Date(filteredNote.createdAt)
+                              )}\nUpdated At: ${dateFormatter.format(
+                                new Date(filteredNote.updatedAt)
+                              )}`,
+                            });
+                          }}
+                        >
+                          <CiCircleInfo />
+                        </button>
                       </div>
                       <Menubar
                         className="md:hidden flex"
@@ -334,6 +362,12 @@ function Notes() {
                                 <FiTrash2 />
                               </span>
                               Delete
+                            </MenubarItem>
+                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <span>
+                                <CiCircleInfo />
+                              </span>
+                              Info
                             </MenubarItem>
                           </MenubarContent>
                         </MenubarMenu>
@@ -407,6 +441,21 @@ function Notes() {
                       <button className="hidden md:inline">
                         <FiTrash2 />
                       </button>
+                      <button
+                        className="hidden md:inline"
+                        onClick={() => {
+                          toast({
+                            title: "Note Details",
+                            description: `Created At: ${dateFormatter.format(
+                              new Date(notes.createdAt)
+                            )}\nUpdated At: ${dateFormatter.format(
+                              new Date(notes.updatedAt)
+                            )}`,
+                          });
+                        }}
+                      >
+                        <CiCircleInfo />
+                      </button>
                     </div>
                     <Menubar
                       className="md:hidden flex"
@@ -450,6 +499,12 @@ function Notes() {
                               <FiTrash2 />
                             </span>
                             Delete
+                          </MenubarItem>
+                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <span>
+                              <CiCircleInfo />
+                            </span>
+                            Info
                           </MenubarItem>
                         </MenubarContent>
                       </MenubarMenu>
@@ -550,7 +605,10 @@ function Notes() {
                   </div>
                   <footer className="flex justify-between items-center pt-1.5 absolute bottom-1 right-0 left-0 w-full px-2.5">
                     <small>{notes.createdAt.slice(0, 10)}</small>
-                    <div className="space-x-2">
+                    <div
+                      className="space-x-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
                         className={`hidden md:inline ${
                           notes.isFavorite ? "text-red-500" : "text-black"
@@ -561,6 +619,21 @@ function Notes() {
                       </button>
                       <button className="hidden md:inline">
                         <FiTrash2 />
+                      </button>
+                      <button
+                        className="hidden md:inline"
+                        onClick={() => {
+                          toast({
+                            title: "Note Details",
+                            description: `Created At: ${dateFormatter.format(
+                              new Date(notes.createdAt)
+                            )}\nUpdated At: ${dateFormatter.format(
+                              new Date(notes.updatedAt)
+                            )}`,
+                          });
+                        }}
+                      >
+                        <CiCircleInfo />
                       </button>
                     </div>
                     <Menubar
@@ -605,6 +678,12 @@ function Notes() {
                               <FiTrash2 />
                             </span>
                             Delete
+                          </MenubarItem>
+                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <span>
+                              <CiCircleInfo />
+                            </span>
+                            Info
                           </MenubarItem>
                         </MenubarContent>
                       </MenubarMenu>
