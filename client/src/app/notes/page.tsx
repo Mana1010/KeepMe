@@ -163,13 +163,7 @@ function Notes() {
   const filterNotePinned = data?.filter((user) => user.isPinned);
   const filteredNotenotPinned = data?.filter((user) => !user.isPinned);
   const dateFormatter = new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    timeZone: "UTC",
+    dateStyle: "full",
   });
   return (
     <div className="h-screen w-full px-4 py-2 relative">
@@ -311,11 +305,11 @@ function Notes() {
                           onClick={() => {
                             toast({
                               title: "Note Details",
-                              description: `Created At: ${dateFormatter.format(
-                                new Date(filteredNote.createdAt)
-                              )}\nUpdated At: ${dateFormatter.format(
-                                new Date(filteredNote.updatedAt)
-                              )}`,
+                              description: `Created At: ${new Date(
+                                filteredNote.createdAt
+                              )}\nUpdated At: ${new Date(
+                                filteredNote.updatedAt
+                              ).toString()}`,
                             });
                           }}
                         >
@@ -446,11 +440,9 @@ function Notes() {
                         onClick={() => {
                           toast({
                             title: "Note Details",
-                            description: `Created At: ${dateFormatter.format(
-                              new Date(notes.createdAt)
-                            )}\nUpdated At: ${dateFormatter.format(
-                              new Date(notes.updatedAt)
-                            )}`,
+                            description: `Created At: ${new Date(
+                              notes.createdAt
+                            )}\nUpdated At: ${notes.updatedAt}`,
                           });
                         }}
                       >
@@ -625,11 +617,7 @@ function Notes() {
                         onClick={() => {
                           toast({
                             title: "Note Details",
-                            description: `Created At: ${dateFormatter.format(
-                              new Date(notes.createdAt)
-                            )}\nUpdated At: ${dateFormatter.format(
-                              new Date(notes.updatedAt)
-                            )}`,
+                            description: `Created At: ${notes.createdAt}\nUpdated At: ${notes.updatedAt}`,
                           });
                         }}
                       >

@@ -20,7 +20,7 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
   } = req.body;
   console.log(req.body);
   try {
-    await Notes.create({
+    const createNote = await Notes.create({
       title,
       content,
       isBold,

@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { now } from "mongoose";
+import moment from "moment-timezone";
+
 const noteSchema = new mongoose.Schema({
   title: String,
   content: String,
@@ -40,20 +42,16 @@ const noteSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: new Date(),
+    default: () => Date.now(),
   },
   updatedAt: {
     type: Date,
-    default: new Date(),
+    default: () => Date.now(),
   },
 });
 noteSchema.pre("save", function (next) {
-  if (this.isModified("title") || this.isModified("content")) {
-    this.updatedAt = new Date();
-    next();
-    return;
-  }
+  this.updatedAt = new Date();
   next();
 });
-
+console.log(new Date(Date.now()).toLocaleString());
 export const Notes = mongoose.model("notes", noteSchema);
