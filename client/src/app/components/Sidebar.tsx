@@ -199,7 +199,7 @@ function Sidebar() {
         </ul>
       </div>
       <footer className="absolute bottom-2 left-0 right-0 px-2 flex justify-center flex-col items-center gap-2">
-        <small className="text-[#120C18]">
+        <small className="text-[#120C18] break-all">
           {currentUser?.email ? currentUser.email : "You are not login yet!"}
         </small>
         {currentUser && (

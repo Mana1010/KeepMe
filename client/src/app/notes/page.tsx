@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { utilStore } from "@/store/util.store";
 import { CiSearch } from "react-icons/ci";
 import { FaPlus, FaCirclePlus } from "react-icons/fa6";
-import { Tooltip } from "react-tooltip";
 import AddNote from "../components/Notes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -29,6 +28,11 @@ import { MdOutlineHeartBroken } from "react-icons/md";
 import noResult from "../components/img/no-result-found.png";
 import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import {
   Menubar,
@@ -164,6 +168,7 @@ function Notes() {
   const filteredNotenotPinned = data?.filter((user) => !user.isPinned);
   const dateFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: "full",
+    timeStyle: "short",
   });
   return (
     <div className="h-screen w-full px-4 py-2 relative">
@@ -300,72 +305,99 @@ function Notes() {
                         <button className="hidden md:inline">
                           <FiTrash2 />
                         </button>
-                        <button
-                          className="hidden md:inline"
-                          onClick={() => {
-                            toast({
-                              title: "Note Details",
-                              description: `Created At: ${new Date(
-                                filteredNote.createdAt
-                              )}\nUpdated At: ${new Date(
-                                filteredNote.updatedAt
-                              ).toString()}`,
-                            });
-                          }}
-                        >
-                          <CiCircleInfo />
-                        </button>
+                        <Popover>
+                          <PopoverTrigger>
+                            <button className="hidden md:inline">
+                              <CiCircleInfo />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
+                            <h1>NOTE DETAILS</h1>
+                            <small>
+                              <span>CREATED AT:</span>{" "}
+                              {dateFormatter.format(
+                                new Date(filteredNote.createdAt)
+                              )}
+                            </small>
+                            <small>
+                              <span>UPDATED AT:</span>{" "}
+                              {dateFormatter.format(
+                                new Date(filteredNote.updatedAt)
+                              )}
+                            </small>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <Menubar
+                      <div
                         className="md:hidden flex"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <MenubarMenu>
-                          <MenubarTrigger>
-                            <BsThreeDotsVertical />
-                          </MenubarTrigger>
-                          <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
-                            <MenubarItem
-                              className="cursor-pointer font-primary p-2 flex gap-2"
-                              onClick={() => mutatePinNote.mutate(filteredNote)}
-                            >
-                              <span>
-                                <MdOutlinePushPin />
-                              </span>
-                              {filteredNote.isPinned ? "Unpin" : "Pin"}
-                            </MenubarItem>
-                            <MenubarItem
-                              className="cursor-pointer font-primary p-2 flex gap-2"
-                              onClick={() => {
-                                mutateFavoriteNote.mutate(filteredNote);
-                              }}
-                            >
-                              <span>
-                                {filteredNote.isFavorite ? (
-                                  <MdOutlineHeartBroken />
-                                ) : (
-                                  <IoIosHeartEmpty />
-                                )}
-                              </span>
-                              {filteredNote.isFavorite
-                                ? "Remove from Favorites"
-                                : "Add to Favorites"}
-                            </MenubarItem>
-                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                              <span>
-                                <FiTrash2 />
-                              </span>
-                              Delete
-                            </MenubarItem>
-                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                              <span>
-                                <CiCircleInfo />
-                              </span>
-                              Info
-                            </MenubarItem>
-                          </MenubarContent>
-                        </MenubarMenu>
-                      </Menubar>
+                        <Menubar>
+                          <MenubarMenu>
+                            <MenubarTrigger>
+                              <BsThreeDotsVertical />
+                            </MenubarTrigger>
+                            <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
+                              <MenubarItem
+                                className="cursor-pointer font-primary p-2 flex gap-2"
+                                onClick={() =>
+                                  mutatePinNote.mutate(filteredNote)
+                                }
+                              >
+                                <span>
+                                  <MdOutlinePushPin />
+                                </span>
+                                {filteredNote.isPinned ? "Unpin" : "Pin"}
+                              </MenubarItem>
+                              <MenubarItem
+                                className="cursor-pointer font-primary p-2 flex gap-2"
+                                onClick={() => {
+                                  mutateFavoriteNote.mutate(filteredNote);
+                                }}
+                              >
+                                <span>
+                                  {filteredNote.isFavorite ? (
+                                    <MdOutlineHeartBroken />
+                                  ) : (
+                                    <IoIosHeartEmpty />
+                                  )}
+                                </span>
+                                {filteredNote.isFavorite
+                                  ? "Remove from Favorites"
+                                  : "Add to Favorites"}
+                              </MenubarItem>
+                              <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                                <span>
+                                  <FiTrash2 />
+                                </span>
+                                Delete
+                              </MenubarItem>
+                            </MenubarContent>
+                          </MenubarMenu>
+                        </Menubar>
+                        <Popover>
+                          <PopoverTrigger>
+                            <button className="cursor-pointer font-primary p-2 flex gap-2">
+                              <CiCircleInfo />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
+                            <h1>NOTE DETAILS</h1>
+                            <small>
+                              <span>CREATED AT:</span>{" "}
+                              {dateFormatter.format(
+                                new Date(filteredNote.createdAt)
+                              )}
+                            </small>
+                            <small>
+                              <span>UPDATED AT:</span>{" "}
+                              {dateFormatter.format(
+                                new Date(filteredNote.updatedAt)
+                              )}
+                            </small>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </footer>
                   </motion.div>
                 ))}
@@ -435,72 +467,89 @@ function Notes() {
                       <button className="hidden md:inline">
                         <FiTrash2 />
                       </button>
-                      <button
-                        className="hidden md:inline"
-                        onClick={() => {
-                          toast({
-                            title: "Note Details",
-                            description: `Created At: ${new Date(
-                              notes.createdAt
-                            )}\nUpdated At: ${notes.updatedAt}`,
-                          });
-                        }}
-                      >
-                        <CiCircleInfo />
-                      </button>
+                      <Popover>
+                        <PopoverTrigger>
+                          <button className="hidden md:inline">
+                            <CiCircleInfo />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
+                          <h1>NOTE DETAILS</h1>
+                          <small>
+                            <span>CREATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.createdAt))}
+                          </small>
+                          <small>
+                            <span>UPDATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.updatedAt))}
+                          </small>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                    <Menubar
+                    <div
                       className="md:hidden flex"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MenubarMenu>
-                        <MenubarTrigger>
-                          <BsThreeDotsVertical />
-                        </MenubarTrigger>
-                        <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
-                          <MenubarItem
-                            className="cursor-pointer font-primary p-2 flex gap-2"
-                            onClick={() => {
-                              mutatePinNote.mutate(notes);
-                            }}
-                          >
-                            <span>
-                              <MdOutlinePushPin />
-                            </span>
-                            {notes.isPinned ? "Unpin" : "Pin"}
-                          </MenubarItem>
-                          <MenubarItem
-                            className="cursor-pointer font-primary p-2 flex gap-2"
-                            onClick={(e) => {
-                              mutateFavoriteNote.mutate(notes);
-                            }}
-                          >
-                            <span>
-                              {notes.isFavorite ? (
-                                <MdOutlineHeartBroken />
-                              ) : (
-                                <IoIosHeartEmpty />
-                              )}
-                            </span>
-                            {notes.isFavorite
-                              ? "Remove from Favorites"
-                              : "Add to Favorites"}
-                          </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                            <span>
-                              <FiTrash2 />
-                            </span>
-                            Delete
-                          </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                            <span>
-                              <CiCircleInfo />
-                            </span>
-                            Info
-                          </MenubarItem>
-                        </MenubarContent>
-                      </MenubarMenu>
-                    </Menubar>
+                      <Menubar>
+                        <MenubarMenu>
+                          <MenubarTrigger>
+                            <BsThreeDotsVertical />
+                          </MenubarTrigger>
+                          <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => mutatePinNote.mutate(notes)}
+                            >
+                              <span>
+                                <MdOutlinePushPin />
+                              </span>
+                              {notes.isPinned ? "Unpin" : "Pin"}
+                            </MenubarItem>
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => {
+                                mutateFavoriteNote.mutate(notes);
+                              }}
+                            >
+                              <span>
+                                {notes.isFavorite ? (
+                                  <MdOutlineHeartBroken />
+                                ) : (
+                                  <IoIosHeartEmpty />
+                                )}
+                              </span>
+                              {notes.isFavorite
+                                ? "Remove from Favorites"
+                                : "Add to Favorites"}
+                            </MenubarItem>
+                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <span>
+                                <FiTrash2 />
+                              </span>
+                              Delete
+                            </MenubarItem>
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                      <Popover>
+                        <PopoverTrigger>
+                          <button className="cursor-pointer font-primary p-2 flex gap-2">
+                            <CiCircleInfo />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
+                          <h1>NOTE DETAILS</h1>
+                          <small>
+                            <span>CREATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.createdAt))}
+                          </small>
+                          <small>
+                            <span>UPDATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.updatedAt))}
+                          </small>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </footer>
                 </motion.div>
               ))}
@@ -612,70 +661,89 @@ function Notes() {
                       <button className="hidden md:inline">
                         <FiTrash2 />
                       </button>
-                      <button
-                        className="hidden md:inline"
-                        onClick={() => {
-                          toast({
-                            title: "Note Details",
-                            description: `Created At: ${notes.createdAt}\nUpdated At: ${notes.updatedAt}`,
-                          });
-                        }}
-                      >
-                        <CiCircleInfo />
-                      </button>
+                      <Popover>
+                        <PopoverTrigger>
+                          <button className="hidden md:inline">
+                            <CiCircleInfo />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
+                          <h1>NOTE DETAILS</h1>
+                          <small>
+                            <span>CREATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.createdAt))}
+                          </small>
+                          <small>
+                            <span>UPDATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.updatedAt))}
+                          </small>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                    <Menubar
+                    <div
                       className="md:hidden flex"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MenubarMenu>
-                        <MenubarTrigger>
-                          <BsThreeDotsVertical />
-                        </MenubarTrigger>
-                        <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
-                          <MenubarItem
-                            className="cursor-pointer font-primary p-2 flex gap-2"
-                            onClick={() => {
-                              mutatePinNote.mutate(notes);
-                            }}
-                          >
-                            <span>
-                              <MdOutlinePushPin />
-                            </span>
-                            {notes.isPinned ? "Unpin" : "Pin"}
-                          </MenubarItem>
-                          <MenubarItem
-                            className="cursor-pointer font-primary p-2 flex gap-2"
-                            onClick={(e) => {
-                              mutateFavoriteNote.mutate(notes);
-                            }}
-                          >
-                            <span>
-                              {notes.isFavorite ? (
-                                <MdOutlineHeartBroken />
-                              ) : (
-                                <IoIosHeartEmpty />
-                              )}
-                            </span>
-                            {notes.isFavorite
-                              ? "Remove from Favorites"
-                              : "Add to Favorites"}
-                          </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                            <span>
-                              <FiTrash2 />
-                            </span>
-                            Delete
-                          </MenubarItem>
-                          <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
-                            <span>
-                              <CiCircleInfo />
-                            </span>
-                            Info
-                          </MenubarItem>
-                        </MenubarContent>
-                      </MenubarMenu>
-                    </Menubar>
+                      <Menubar>
+                        <MenubarMenu>
+                          <MenubarTrigger>
+                            <BsThreeDotsVertical />
+                          </MenubarTrigger>
+                          <MenubarContent className="bg-black text-white rounded-md divide-y-[1px] divide-[#27272A]">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => mutatePinNote.mutate(notes)}
+                            >
+                              <span>
+                                <MdOutlinePushPin />
+                              </span>
+                              {notes.isPinned ? "Unpin" : "Pin"}
+                            </MenubarItem>
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => {
+                                mutateFavoriteNote.mutate(notes);
+                              }}
+                            >
+                              <span>
+                                {notes.isFavorite ? (
+                                  <MdOutlineHeartBroken />
+                                ) : (
+                                  <IoIosHeartEmpty />
+                                )}
+                              </span>
+                              {notes.isFavorite
+                                ? "Remove from Favorites"
+                                : "Add to Favorites"}
+                            </MenubarItem>
+                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <span>
+                                <FiTrash2 />
+                              </span>
+                              Delete
+                            </MenubarItem>
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                      <Popover>
+                        <PopoverTrigger>
+                          <button className="cursor-pointer font-primary p-2 flex gap-2">
+                            <CiCircleInfo />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
+                          <h1>NOTE DETAILS</h1>
+                          <small>
+                            <span>CREATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.createdAt))}
+                          </small>
+                          <small>
+                            <span>UPDATED AT:</span>{" "}
+                            {dateFormatter.format(new Date(notes.updatedAt))}
+                          </small>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </footer>
                 </motion.div>
               ))}

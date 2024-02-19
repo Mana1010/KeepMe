@@ -138,7 +138,7 @@ function AddNote({ setAddNote }: Data) {
           e.preventDefault();
           mutateNote.mutate();
         }}
-        className="w-full md:w-[70%] lg:w-[50%] bg-white h-full md:h-[460px] absolute border-2 shadow-sm shadow-black px-2 py-2"
+        className="w-full md:w-[70%] lg:w-[50%] bg-white h-full md:h-[460px] absolute shadow-sm shadow-black/20 px-2 py-2"
       >
         <header className="flex justify-between items-center py-2">
           <div>
@@ -263,7 +263,7 @@ function AddNote({ setAddNote }: Data) {
           </div>
           <div
             style={{ backgroundColor: note.bgColor }}
-            className="shadow-lg w-full md:h-[250px] h-[68vh] rounded-sm p-2"
+            className=" w-full md:h-[250px] h-[68vh] rounded-sm p-2"
           >
             <textarea
               id="textarea"
@@ -279,17 +279,17 @@ function AddNote({ setAddNote }: Data) {
             ></textarea>
           </div>
         </div>
-        <div className="w-full flex gap-2 pt-2">
+        <div className="w-full flex gap-2 md:pt-3 pt-1.5 justify-end">
           <button
             onClick={() => setAddNote((prev: boolean) => !prev)}
             type="button"
-            className="w-[20%] py-2 bg-black text-white rounded-md"
+            className="w-[30%] py-2 bg-[#101314] text-white rounded-lg"
           >
             BACK
           </button>
           <button
             type="submit"
-            className="w-[80%] py-2 bg-black text-white rounded-md"
+            className="w-[70%] py-2 shadow-md bg-[#101314] text-white rounded-lg"
           >
             ADD NOTE
           </button>

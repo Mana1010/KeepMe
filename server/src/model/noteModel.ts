@@ -42,16 +42,17 @@ const noteSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: () => Date.now(),
+    default: () => new Date(),
   },
   updatedAt: {
     type: Date,
-    default: () => Date.now(),
+    default: () => new Date(),
   },
 });
 noteSchema.pre("save", function (next) {
-  this.updatedAt = new Date();
+  if (this.isModified("title") || this.isModified("content")) {
+    this.updatedAt = new Date();
+  }
   next();
 });
-console.log(new Date(Date.now()).toLocaleString());
 export const Notes = mongoose.model("notes", noteSchema);
