@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
 import { noteStore } from "@/store/note.store";
+
 interface Data {
   setAddNote: any;
 }
@@ -101,7 +102,6 @@ function AddNote({ setAddNote }: Data) {
       setAddNote((prev: boolean) => !prev);
     },
     onError: (error: any) => {
-      toast.error("Please check your connection and try again");
       toast.error(error.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });
@@ -124,7 +124,6 @@ function AddNote({ setAddNote }: Data) {
     }
     return;
   }, [note.isListOpen]);
-  console.log(note);
   return (
     <div
       onClick={() => {

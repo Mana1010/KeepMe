@@ -128,3 +128,16 @@ export const editNoteFavorite = asyncHandler(
       .json({ message: "Note successfully remove from Favorites." });
   }
 );
+export const getEditNote = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const { id } = req.params;
+  const getNote = await Notes.findById(id);
+  if (!getNote) {
+    res.status(404);
+    throw new Error("No note found");
+  }
+  res.status(200).json({ message: getNote });
+});
