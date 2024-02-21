@@ -20,7 +20,7 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
   } = req.body;
   console.log(req.body);
   try {
-    const createNote = await Notes.create({
+    await Notes.create({
       title,
       content,
       isBold,
@@ -44,7 +44,9 @@ export const getNotes = asyncHandler(async (req: Request, res: Response) => {
     res.status(401);
     throw new Error("Unauthorized");
   }
-  const userNote = await Notes.find({ createdBy: req.user._id });
+  const userNote = await Notes.find({ createdBy: req.user._id }).sort({
+    updatedAt: -1,
+  });
   if (!userNote) {
     res.status(200).json({ message: [] });
   }
@@ -140,4 +142,18 @@ export const getEditNote = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("No note found");
   }
   res.status(200).json({ message: getNote });
+});
+
+export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const { id } = req.params;
+  const getNote = await Notes.findByIdAndDelete(id);
+  if (!getNote) {
+    res.status(404);
+    throw new Error("No note found with the provided ID");
+  }
+  res.status(202).json({ message: "Your note is being moved to the Trash" });
 });

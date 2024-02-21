@@ -7,6 +7,7 @@ import {
   editNotePin,
   editNoteFavorite,
   getEditNote,
+  deleteNote,
 } from "../controller/noteController";
 const router = express.Router();
 
@@ -17,7 +18,8 @@ router
 router
   .route("/notes/:id")
   .get(protectedRoutes, getEditNote)
-  .patch(protectedRoutes, editNotes);
+  .patch(protectedRoutes, editNotes)
+  .delete(protectedRoutes, deleteNote);
 router.patch("/notes/pin/:id", protectedRoutes, editNotePin);
 router.patch("/notes/favorite/:id", protectedRoutes, editNoteFavorite);
 export default router;

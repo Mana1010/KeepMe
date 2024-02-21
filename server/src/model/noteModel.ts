@@ -1,5 +1,4 @@
 import mongoose, { now } from "mongoose";
-import moment from "moment-timezone";
 
 const noteSchema = new mongoose.Schema({
   title: String,
@@ -38,7 +37,6 @@ const noteSchema = new mongoose.Schema({
   },
   owner: {
     type: String,
-    ref: "User",
   },
   createdAt: {
     type: Date,

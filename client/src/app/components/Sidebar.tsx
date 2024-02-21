@@ -117,26 +117,8 @@ function Sidebar() {
               </div>
 
               <div className={`${!currentUser && "hidden"} block`}>
-                {/* <span
-                  className={`absolute top-[-15px] text-black font-semibold right-[5px]`}
-                >
-                  {<MdOutlineExposurePlus1 />}
-                </span> */}
                 <small className="font-semibold">{data?.length}</small>
               </div>
-            </div>
-          </Link>
-          <Link href={"/favorites"}>
-            <div
-              className={`flex gap-2 w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold ${
-                pathname === "/favorites" && "bg-[#120C18] text-white"
-              }`}
-            >
-              <span>
-                {" "}
-                <MdFavorite />
-              </span>
-              <small>FAVORITES</small>
             </div>
           </Link>
           <Link href={"/trash"}>

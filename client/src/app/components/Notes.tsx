@@ -2,8 +2,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import keepMeIcon from "./img/keepMe-lightmode.png";
-import { LuPin } from "react-icons/lu";
-import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
+import { LuPin, LuPinOff } from "react-icons/lu";
+import { MdKeyboardArrowDown } from "react-icons/md";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
 import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
@@ -37,6 +38,8 @@ function AddNote({ setAddNote }: Data) {
     setListOpen,
     setOpenBgPropagate,
     setOpenListStylePropagate,
+    setPinned,
+    setFavorite,
   } = noteStore();
   const bgColor = [
     "white",
@@ -144,11 +147,23 @@ function AddNote({ setAddNote }: Data) {
             <Image width={80} src={keepMeIcon} alt="icon" priority />
           </div>
           <div className="space-x-3 flex">
-            <button name="isPinned" type="button" className="text-xl">
-              <LuPin />
+            <button
+              name="isPinned"
+              type="button"
+              className="text-xl"
+              onClick={setPinned}
+            >
+              {note.isPinned ? <LuPinOff /> : <LuPin />}
             </button>
-            <button name="isBold" type="button" className="text-xl">
-              <MdFavoriteBorder />
+            <button
+              name="isBold"
+              type="button"
+              className="text-xl"
+              onClick={setFavorite}
+            >
+              <span className={`${note.isFavorite && "text-red-500"}`}>
+                {note.isFavorite ? <GoHeartFill /> : <GoHeart />}
+              </span>
             </button>
             <button
               onClick={(e) => {

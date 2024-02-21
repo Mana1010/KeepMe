@@ -27,7 +27,6 @@ import { MdOutlinePushPin } from "react-icons/md";
 import { MdOutlineHeartBroken } from "react-icons/md";
 import noResult from "../components/img/no-result-found.png";
 import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
-import { useToast } from "@/components/ui/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -55,7 +54,6 @@ function Notes() {
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
-  const { toast } = useToast();
   const { setCurrentUser } = utilStore();
   console.log(new Date());
   useEffect(() => {
@@ -132,6 +130,31 @@ function Notes() {
       const response = await axios.patch(
         `http://localhost:5000/user/notes/favorite/${data._id}`,
         { isFavorite: !data.isFavorite },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries();
+      toaster.success(data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+    onError: (error: any) => {
+      toaster.error(error.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+  const deleteNote = useMutation({
+    mutationFn: async (data: NoteData) => {
+      const response = await axios.delete(
+        `http://localhost:5000/user/notes/${data._id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
@@ -302,7 +325,10 @@ function Notes() {
                             <FiHeart />
                           )}
                         </button>
-                        <button className="hidden md:inline">
+                        <button
+                          className="hidden md:inline"
+                          onClick={() => deleteNote.mutate(filteredNote)}
+                        >
                           <FiTrash2 />
                         </button>
                         <Popover>
@@ -366,7 +392,10 @@ function Notes() {
                                   ? "Remove from Favorites"
                                   : "Add to Favorites"}
                               </MenubarItem>
-                              <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                              <MenubarItem
+                                className="cursor-pointer font-primary p-2 flex gap-2"
+                                onClick={() => deleteNote.mutate(filteredNote)}
+                              >
                                 <span>
                                   <FiTrash2 />
                                 </span>
@@ -464,7 +493,10 @@ function Notes() {
                       >
                         {notes.isFavorite ? <IoMdHeart /> : <FiHeart />}
                       </button>
-                      <button className="hidden md:inline">
+                      <button
+                        className="hidden md:inline"
+                        onClick={() => deleteNote.mutate(notes)}
+                      >
                         <FiTrash2 />
                       </button>
                       <Popover>
@@ -522,7 +554,10 @@ function Notes() {
                                 ? "Remove from Favorites"
                                 : "Add to Favorites"}
                             </MenubarItem>
-                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => deleteNote.mutate(notes)}
+                            >
                               <span>
                                 <FiTrash2 />
                               </span>
@@ -658,7 +693,10 @@ function Notes() {
                       >
                         {notes.isFavorite ? <IoMdHeart /> : <FiHeart />}
                       </button>
-                      <button className="hidden md:inline">
+                      <button
+                        className="hidden md:inline"
+                        onClick={() => deleteNote.mutate(notes)}
+                      >
                         <FiTrash2 />
                       </button>
                       <Popover>
@@ -716,7 +754,10 @@ function Notes() {
                                 ? "Remove from Favorites"
                                 : "Add to Favorites"}
                             </MenubarItem>
-                            <MenubarItem className="cursor-pointer font-primary p-2 flex gap-2">
+                            <MenubarItem
+                              className="cursor-pointer font-primary p-2 flex gap-2"
+                              onClick={() => deleteNote.mutate(notes)}
+                            >
                               <span>
                                 <FiTrash2 />
                               </span>

@@ -30,6 +30,7 @@ export interface UserNoteStore extends StateNote {
   colorPickOnClick: (color: string) => void;
   setOpenListStyle: () => void;
   setPinned: () => void;
+  setFavorite: () => void;
   setBold: () => void;
   setItalic: () => void;
   setOpenBg: () => void;
@@ -65,7 +66,6 @@ const store = (set: any) => ({
       },
     }));
   },
-
   colorPickonMouseOver: (color: string) => {
     set((state: StateNote) => ({
       note: {
@@ -103,6 +103,14 @@ const store = (set: any) => ({
       note: {
         ...state.note,
         isPinned: !state.note.isPinned,
+      },
+    }));
+  },
+  setFavorite: () => {
+    set((state: StateNote) => ({
+      note: {
+        ...state.note,
+        isFavorite: !state.note.isFavorite,
       },
     }));
   },
