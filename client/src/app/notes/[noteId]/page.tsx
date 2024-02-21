@@ -18,7 +18,7 @@ import keeMeIcon from "../../components/img/keepMe-lightmode.png";
 import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
 import { LuPin } from "react-icons/lu";
 import { EditUserNote } from "@/store/edit.note.store";
-import { EditNoteStore } from "@/store/edit.note.store";
+import { editNoteStore } from "@/store/edit.note.store";
 
 interface Param {
   params: {
@@ -27,22 +27,23 @@ interface Param {
 }
 function Note({ params }: Param) {
   const matches = useMediaQuery("(min-width: 640px)");
-  const { editInfo, setEditInfo, setHandleChange } = EditNoteStore();
-  const { openBg, openListStyle } = noteStore();
+  const { editInfo, openBg, openListStyle } = editNoteStore();
   const {
+    setEditInfo,
+    setHandleChange,
     setOpenBgPropagate,
     setOpenListStylePropagate,
     colorPickOnClick,
     colorPickonMouseOver,
     listType,
     setListSymbol,
-    removeDuplicateSymbols,
     setOpenListStyle,
     setOpenBg,
     setBold,
     setItalic,
     setListOpen,
-  } = noteStore();
+    removeDuplicateSymbols,
+  } = editNoteStore();
   const bgColor = [
     "white",
     "#D9BCFC",
@@ -82,6 +83,10 @@ function Note({ params }: Param) {
       symbol: "✔",
     },
   ];
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
   const [openAlert, setOpenAlert] = useState(false);
   const { setCurrentUser } = utilStore();
   const router = useRouter();
@@ -101,9 +106,10 @@ function Note({ params }: Param) {
     },
     onSuccess: (data) => {
       toast.success(data);
+      router.push("/notes");
     },
     onError: (err) => {
-      console.log(err);
+      toast.error(err.message);
     },
   });
   useQuery({
@@ -123,16 +129,16 @@ function Note({ params }: Param) {
     },
   });
   const listFilter = typeList.find((type) => type.name === editInfo.listType);
-  // useEffect(() => {
-  //   const filterSymbols = typeList.find(
-  //     (type) => type.name === editInfo.listType
-  //   );
-  //   // const removeDot = editInfo.content.split("");
-  //   if (editInfo.isListOpen && removeDot[0] !== filterSymbols?.symbol) {
-  //     removeDuplicateSymbols(filterSymbols);
-  //   }
-  //   return;
-  // }, [editInfo.isListOpen]);
+  useEffect(() => {
+    const filterSymbols = typeList.find(
+      (type) => type.name === editInfo.listType
+    );
+    const removeDot = editInfo.content?.split("");
+    if (editInfo.isListOpen && removeDot[0] !== filterSymbols?.symbol) {
+      removeDuplicateSymbols(filterSymbols);
+    }
+    return;
+  }, [editInfo.isListOpen]);
   useEffect(() => {
     async function checkTokens() {
       const token = localStorage.getItem("userToken");
@@ -163,7 +169,7 @@ function Note({ params }: Param) {
   }
   return (
     <div
-      className="w-full h-screen flex justify-center items-center backdrop-blur-lg"
+      className="w-full h-screen px-3 flex items-center justify-center"
       onClick={() => {
         setOpenBgPropagate();
         setOpenListStylePropagate();
@@ -298,7 +304,7 @@ function Note({ params }: Param) {
           </div>
           <div
             style={{ backgroundColor: editInfo.bgColor }}
-            className=" w-full md:h-[250px] h-[68vh] rounded-sm p-2"
+            className=" w-full md:h-[235px] h-[64vh] rounded-sm p-2"
           >
             <textarea
               id="textarea"
@@ -315,10 +321,21 @@ function Note({ params }: Param) {
             ></textarea>
           </div>
         </div>
-        <div className="w-full flex gap-2 md:pt-3 pt-1.5 justify-end">
+        <div>
+          <small className="text-black font-bold break-all">
+            Last Edited At:{" "}
+            <span className="font-extralight">
+              {editInfo?.updatedAt
+                ? dateFormatter.format(new Date(editInfo.updatedAt))
+                : "N/A"}
+            </span>
+          </small>
+        </div>
+        <div className="w-full flex gap-2 md:pt-2.5 pt-1 justify-end">
           <button
             type="button"
             className="w-[30%] py-2 bg-[#101314] text-white rounded-lg"
+            onClick={() => router.push("/notes")}
           >
             BACK
           </button>
@@ -326,7 +343,7 @@ function Note({ params }: Param) {
             type="submit"
             className="w-[70%] py-2 shadow-md bg-[#101314] text-white rounded-lg"
           >
-            ADD NOTE
+            UPDATE NOTE
           </button>
         </div>
       </form>

@@ -134,7 +134,7 @@ export const getEditNote = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Unauthorized");
   }
   const { id } = req.params;
-  const getNote = await Notes.findById(id);
+  const getNote = await Notes.findById(id).select({ createdAt: 0, owner: 0 });
   if (!getNote) {
     res.status(404);
     throw new Error("No note found");

@@ -16,7 +16,7 @@ interface StateNote {
   openBg: boolean;
   openListStyle: boolean;
 }
-interface TypeList {
+export interface TypeList {
   name: string;
   icon: any;
   symbol: string;
