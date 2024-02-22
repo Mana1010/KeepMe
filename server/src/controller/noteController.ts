@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
-import { Notes } from "../model/noteModel";
+import { Notes, NotesDocument } from "../model/noteModel";
+import { Trash } from "../model/trashModel";
 
 export const addNote = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) {
@@ -150,10 +151,27 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Unauthorized");
   }
   const { id } = req.params;
-  const getNote = await Notes.findByIdAndDelete(id);
+  const getNote = await Notes.findById(id);
   if (!getNote) {
     res.status(404);
     throw new Error("No note found with the provided ID");
   }
+  await Notes.deleteOne({ _id: id });
+  const movetoTrash = await Trash.create({
+    title: getNote.title,
+    content: getNote.content,
+    isBold: getNote.isBold,
+    isItalic: getNote.isItalic,
+    isListOpen: getNote.isListOpen,
+    listType: getNote.listType,
+    isPinned: getNote.isPinned,
+    isFavorite: getNote.isFavorite,
+    bgColor: getNote.bgColor,
+    createdBy: getNote.createdBy,
+    noteId: getNote._id,
+    owner: getNote.owner,
+    createdAt: getNote.createdAt,
+    updatedAt: getNote.updatedAt,
+  });
   res.status(202).json({ message: "Your note is being moved to the Trash" });
 });

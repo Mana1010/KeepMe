@@ -1,5 +1,20 @@
-import mongoose, { now } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
+export interface NotesDocument extends Document {
+  title: string;
+  content: string;
+  isBold: boolean;
+  isItalic: boolean;
+  isListOpen: boolean;
+  listType: string;
+  isPinned: boolean;
+  isFavorite: boolean;
+  bgColor: string;
+  createdBy: any;
+  owner: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 const noteSchema = new mongoose.Schema({
   title: String,
   content: String,
@@ -53,4 +68,4 @@ noteSchema.pre("save", function (next) {
   }
   next();
 });
-export const Notes = mongoose.model("notes", noteSchema);
+export const Notes = mongoose.model<NotesDocument>("notes", noteSchema);

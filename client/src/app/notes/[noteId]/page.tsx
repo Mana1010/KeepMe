@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import checkToken from "@/utils/checkToken";
-import Alert from "@/components/ui/Alert";
+import Alert from "@/components/ui/ExpiredToken";
 import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
 

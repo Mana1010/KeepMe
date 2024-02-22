@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useEffect, useState } from "react";
-import Alert from "@/components/ui/Alert";
+import Alert from "@/components/ui/ExpiredToken";
 import checkToken from "@/utils/checkToken";
 import { useRouter } from "next/navigation";
 import { utilStore } from "@/store/util.store";
