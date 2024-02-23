@@ -21,7 +21,7 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
   } = req.body;
   console.log(req.body);
   try {
-    await Notes.create({
+    const newNote = await Notes.create({
       title,
       content,
       isBold,
@@ -34,6 +34,8 @@ export const addNote = asyncHandler(async (req: Request, res: Response) => {
       createdBy: req.user._id,
       owner: req.user.username,
     });
+    newNote.noteId = newNote._id;
+    await newNote.save();
     res.status(201).json({ message: "Successfully add your note" });
   } catch (err) {
     res.status(400);
@@ -156,8 +158,8 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
     res.status(404);
     throw new Error("No note found with the provided ID");
   }
-  await Notes.deleteOne({ _id: id });
-  const movetoTrash = await Trash.create({
+  await Notes.deleteOne({ noteId: id });
+  await Trash.create({
     title: getNote.title,
     content: getNote.content,
     isBold: getNote.isBold,
@@ -168,10 +170,21 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
     isFavorite: getNote.isFavorite,
     bgColor: getNote.bgColor,
     createdBy: getNote.createdBy,
-    noteId: getNote._id,
+    noteId: getNote.noteId,
     owner: getNote.owner,
     createdAt: getNote.createdAt,
     updatedAt: getNote.updatedAt,
   });
   res.status(202).json({ message: "Your note is being moved to the Trash" });
 });
+
+export const getTrashNote = asyncHandler(
+  async (req: Request, res: Response) => {
+    const getAllTrashNote = await Trash.find();
+    if (!getAllTrashNote) {
+      res.status(200).json({ message: [] });
+      return;
+    }
+    res.status(200).json({ message: getAllTrashNote });
+  }
+);

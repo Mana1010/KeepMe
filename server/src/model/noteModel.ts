@@ -53,6 +53,7 @@ const noteSchema = new mongoose.Schema({
   owner: {
     type: String,
   },
+  noteId: mongoose.SchemaTypes.ObjectId,
   createdAt: {
     type: Date,
     default: () => new Date(),
@@ -68,4 +69,4 @@ noteSchema.pre("save", function (next) {
   }
   next();
 });
-export const Notes = mongoose.model<NotesDocument>("notes", noteSchema);
+export const Notes = mongoose.model("notes", noteSchema);

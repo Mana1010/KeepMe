@@ -47,6 +47,7 @@ export interface NoteData extends UserNote {
   updatedAt: string;
   createdAt: string;
   owner: string;
+  noteId: string;
 }
 function Notes() {
   const matches = useMediaQuery("(min-width: 640px)");
@@ -258,7 +259,7 @@ function Notes() {
                 {filterNotePinned?.map((filteredNote) => (
                   <motion.div
                     onClick={() => {
-                      router.push(`notes/${filteredNote._id}`);
+                      router.push(`notes/${filteredNote.noteId}`);
                     }}
                     layout
                     key={filteredNote._id}
@@ -442,7 +443,7 @@ function Notes() {
               {filteredNotenotPinned?.map((notes: NoteData) => (
                 <motion.div
                   onClick={() => {
-                    router.push(`notes/${notes._id}`);
+                    router.push(`notes/${notes.noteId}`);
                   }}
                   layout
                   key={notes._id}
@@ -619,7 +620,7 @@ function Notes() {
               {searchedNotes?.map((notes: NoteData) => (
                 <motion.div
                   onClick={() => {
-                    router.push(`notes/${notes._id}`);
+                    router.push(`notes/${notes.noteId}`);
                   }}
                   layout
                   key={notes._id}

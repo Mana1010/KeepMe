@@ -25,6 +25,10 @@ const trashSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
   },
+  createdTrashAt: {
+    type: Date,
+    default: () => new Date(),
+  },
 });
 
-export const Trash = mongoose.model("trash", trashSchema);
+export const Trash = mongoose.model("trashes", trashSchema);
