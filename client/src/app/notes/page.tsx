@@ -181,7 +181,7 @@ function Notes() {
     toaster.error(error.response.data.message);
   }
   if (isLoading) {
-    return <Loading />;
+    return <Loading>Your Notes is Loading...</Loading>;
   }
   const searchedNotes: NoteData[] | undefined = data?.filter((note) =>
     new RegExp(searchedNoteTitle as string, "i").test(note.title)
@@ -797,7 +797,7 @@ function Notes() {
         onClick={() => {
           setAddNote((prev) => !prev);
         }}
-        className="absolute right-[20px] bottom-[20px] rounded-full w-[50px] h-[50px] bg-black flex justify-center items-center animate-bounce"
+        className="absolute right-[20px] bottom-[20px] rounded-full w-[50px] h-[50px] bg-[#2E2E2E] flex justify-center items-center animate-bounce"
       >
         <span className="text-white">
           {" "}

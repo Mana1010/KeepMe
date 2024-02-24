@@ -180,7 +180,9 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
 
 export const getTrashNote = asyncHandler(
   async (req: Request, res: Response) => {
-    const getAllTrashNote = await Trash.find();
+    const getAllTrashNote = await Trash.find({
+      createdBy: req.user?._id,
+    }).lean();
     if (!getAllTrashNote) {
       res.status(200).json({ message: [] });
       return;

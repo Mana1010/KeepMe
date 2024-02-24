@@ -21,7 +21,7 @@ router
   .get(protectedRoutes, getEditNote)
   .patch(protectedRoutes, editNotes)
   .delete(protectedRoutes, deleteNote);
-router.route("/notes/trash").get(protectedRoutes, getTrashNote);
+router.route("/trashes").get(protectedRoutes, getTrashNote);
 router.patch("/notes/pin/:id", protectedRoutes, editNotePin);
 router.patch("/notes/favorite/:id", protectedRoutes, editNoteFavorite);
 
