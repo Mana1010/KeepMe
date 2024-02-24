@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { Notes, NotesDocument } from "../model/noteModel";
 import { Trash } from "../model/trashModel";
+import { Archive } from "../model/archiveModel";
 
 export const addNote = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) {
@@ -153,7 +154,7 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Unauthorized");
   }
   const { id } = req.params;
-  const getNote = await Notes.findById(id);
+  const getNote = await Notes.findOne({ noteId: id });
   if (!getNote) {
     res.status(404);
     throw new Error("No note found with the provided ID");
@@ -180,9 +181,15 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
 
 export const getTrashNote = asyncHandler(
   async (req: Request, res: Response) => {
+    if (!req.user) {
+      res.status(401);
+      throw new Error("Unauthorized");
+    }
     const getAllTrashNote = await Trash.find({
       createdBy: req.user?._id,
-    }).lean();
+    })
+      .sort({ createdTrashAt: 1 })
+      .lean();
     if (!getAllTrashNote) {
       res.status(200).json({ message: [] });
       return;
@@ -190,3 +197,80 @@ export const getTrashNote = asyncHandler(
     res.status(200).json({ message: getAllTrashNote });
   }
 );
+
+export const deleteAllTrash = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      res.status(401);
+      throw new Error("Unauthorized");
+    }
+    const getNotes = await Trash.find({ createdBy: req.user._id });
+    await Trash.deleteMany({ createdBy: req.user._id });
+    await Archive.insertMany(getNotes);
+    res
+      .status(200)
+      .json({ message: "Successfully deleted all your trash permanently." });
+  }
+);
+export const restoreNote = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const { id } = req.params;
+  const getNote = await Trash.findOne({ noteId: id }).lean();
+  if (!getNote) {
+    res.status(400);
+    throw new Error("Note ID not found, please try again");
+  }
+  await Trash.deleteOne({ noteId: id });
+  await Notes.create({
+    title: getNote.title,
+    content: getNote.content,
+    isBold: getNote.isBold,
+    isItalic: getNote.isItalic,
+    isListOpen: getNote.isListOpen,
+    listType: getNote.listType,
+    isPinned: getNote.isPinned,
+    isFavorite: getNote.isFavorite,
+    bgColor: getNote.bgColor,
+    createdBy: getNote.createdBy,
+    noteId: getNote.noteId,
+    owner: getNote.owner,
+    createdAt: getNote.createdAt,
+    updatedAt: getNote.updatedAt,
+  });
+  res.status(201).json({ message: "Successfully restore the note" });
+});
+export const deleteTrash = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  const { id } = req.params;
+  const getNote = await Trash.findOne({ noteId: id }).lean();
+  if (!getNote) {
+    res.status(400);
+    throw new Error("Note ID not found, please try again");
+  }
+  await Trash.deleteOne({ noteId: id });
+  await Archive.create({
+    title: getNote.title,
+    content: getNote.content,
+    isBold: getNote.isBold,
+    isItalic: getNote.isItalic,
+    isListOpen: getNote.isListOpen,
+    listType: getNote.listType,
+    isPinned: getNote.isPinned,
+    isFavorite: getNote.isFavorite,
+    bgColor: getNote.bgColor,
+    createdBy: getNote.createdBy,
+    noteId: getNote.noteId,
+    owner: getNote.owner,
+    createdAt: getNote.createdAt,
+    updatedAt: getNote.updatedAt,
+  });
+  res
+    .status(200)
+    .json({ message: "Successfully deleted the note permanently." });
+});

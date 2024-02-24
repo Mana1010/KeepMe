@@ -155,7 +155,7 @@ function Notes() {
   const deleteNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axios.delete(
-        `http://localhost:5000/user/notes/${data._id}`,
+        `http://localhost:5000/user/notes/${data.noteId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,

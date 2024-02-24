@@ -66,6 +66,7 @@ const noteSchema = new mongoose.Schema({
 noteSchema.pre("save", function (next) {
   if (this.isModified("title") || this.isModified("content")) {
     this.updatedAt = new Date();
+    console.log("Run!");
   }
   next();
 });
