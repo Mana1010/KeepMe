@@ -17,6 +17,7 @@ const checkToken = async () => {
     const decodedToken: DecodeJWT = jwtDecode(getAccessToken);
     const getExpToken = decodedToken.exp * 1000;
     const currentTime = Date.now();
+    //Checking if the token is expired
     if (currentTime > getExpToken) {
       const refresh = await refreshToken();
       if (refresh) {

@@ -282,7 +282,7 @@ function Notes() {
                       <PiPushPinSlashLight />
                     </span>
                     <header>
-                      <h3 className="font-extrabold text-sm">
+                      <h3 className="font-extrabold text-sm break-all">
                         {filteredNote.title}
                       </h3>
                     </header>
@@ -451,7 +451,9 @@ function Notes() {
                   className="border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative hover:shadow-xl shadow-black transition-shadow ease-in duration-200"
                 >
                   <header className="flex justify-between items-center w-full">
-                    <h3 className="font-extrabold text-sm">{notes.title}</h3>
+                    <h3 className="font-extrabold text-sm break-all">
+                      {notes.title}
+                    </h3>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -628,7 +630,9 @@ function Notes() {
                   className={`border-[1px] border-[#e0e0e0] h-[380px] rounded-md px-3 py-2 relative hover:shadow-xl shadow-black transition-shadow ease-in duration-200 `}
                 >
                   <header className="flex justify-between items-center w-full">
-                    <h3 className="font-extrabold text-sm">{notes.title}</h3>
+                    <h3 className="font-extrabold text-sm break-all">
+                      {notes.title}
+                    </h3>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

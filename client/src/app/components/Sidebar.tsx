@@ -26,12 +26,8 @@ function Sidebar() {
     utilStore() as State;
   const matches = useMediaQuery("(min-width: 640px)");
   useEffect(() => {
-    async function fetchData() {
-      try {
-        await setCurrentUser();
-      } catch (err) {
-        console.log(err);
-      }
+    function fetchData() {
+      setCurrentUser();
     }
     fetchData();
   }, []);
@@ -68,6 +64,7 @@ function Sidebar() {
       return response.data.message;
     },
   });
+
   return (
     <div
       className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${
