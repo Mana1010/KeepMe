@@ -153,7 +153,7 @@ function AddNote({ setAddNote }: Data) {
               className="text-xl"
               onClick={setPinned}
             >
-              {note.isPinned ? <LuPinOff /> : <LuPin />}
+              {note.isPinned ? <LuPin /> : <LuPinOff />}
             </button>
             <button
               name="isBold"

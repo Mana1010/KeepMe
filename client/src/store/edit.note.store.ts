@@ -20,6 +20,7 @@ interface EditInfo extends StateEditInfo {
   colorPickOnClick: (color: string) => void;
   setOpenListStyle: () => void;
   setPinned: () => void;
+  setFavorite: () => void;
   setBold: () => void;
   setItalic: () => void;
   setOpenBg: () => void;
@@ -85,6 +86,14 @@ const store = (set: any) => ({
       editInfo: {
         ...state.editInfo,
         isPinned: !state.editInfo.isPinned,
+      },
+    }));
+  },
+  setFavorite: () => {
+    set((state: StateEditInfo) => ({
+      editInfo: {
+        ...state.editInfo,
+        isFavorite: !state.editInfo.isFavorite,
       },
     }));
   },

@@ -78,6 +78,10 @@ export const editNotes = asyncHandler(async (req: Request, res: Response) => {
     res.status(404);
     throw new Error("Note not found");
   }
+  if (title !== editNote.title || content !== editNote.content) {
+    editNote.updatedAt = new Date();
+  }
+  console.log(title, editNote.title);
   editNote.title = title;
   editNote.content = content;
   editNote.isBold = isBold;
@@ -188,7 +192,7 @@ export const getTrashNote = asyncHandler(
     const getAllTrashNote = await Trash.find({
       createdBy: req.user?._id,
     })
-      .sort({ createdTrashAt: 1 })
+      .sort({ createdTrashAt: -1 })
       .lean();
     if (!getAllTrashNote) {
       res.status(200).json({ message: [] });

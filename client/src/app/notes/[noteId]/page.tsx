@@ -16,7 +16,8 @@ import { TbBold, TbItalic } from "react-icons/tb";
 import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
 import keeMeIcon from "../../components/img/keepMe-lightmode.png";
 import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
-import { LuPin } from "react-icons/lu";
+import { LuPin, LuPinOff } from "react-icons/lu";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 import { EditUserNote } from "@/store/edit.note.store";
 import { editNoteStore } from "@/store/edit.note.store";
 
@@ -43,6 +44,8 @@ function Note({ params }: Param) {
     setItalic,
     setListOpen,
     removeDuplicateSymbols,
+    setFavorite,
+    setPinned,
   } = editNoteStore();
   const bgColor = [
     "white",
@@ -187,11 +190,21 @@ function Note({ params }: Param) {
             <Image width={80} src={keeMeIcon} alt="icon" priority />
           </div>
           <div className="space-x-3 flex">
-            <button name="isPinned" type="button" className="text-xl">
-              <LuPin />
+            <button
+              name="isPinned"
+              type="button"
+              className="text-xl"
+              onClick={setPinned}
+            >
+              {editInfo.isPinned ? <LuPin /> : <LuPinOff />}
             </button>
-            <button name="isBold" type="button" className="text-xl">
-              <MdFavoriteBorder />
+            <button
+              name="isFavorite"
+              type="button"
+              className={`${editInfo.isFavorite && "text-red-500"} text-xl`}
+              onClick={setFavorite}
+            >
+              {editInfo.isFavorite ? <GoHeartFill /> : <GoHeart />}
             </button>
             <button
               onClick={(e) => {

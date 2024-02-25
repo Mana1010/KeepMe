@@ -63,11 +63,11 @@ const noteSchema = new mongoose.Schema({
     default: () => new Date(),
   },
 });
-noteSchema.pre("save", function (next) {
-  if (this.isModified("title") || this.isModified("content")) {
-    this.updatedAt = new Date();
-    console.log("Run!");
-  }
-  next();
-});
+// noteSchema.pre("save", function (next) {
+//   if (this.isModified("title") || this.isModified("content")) {
+//     this.updatedAt = new Date();
+//     console.log("Run!");
+//   }
+//   next();
+// });
 export const Notes = mongoose.model("notes", noteSchema);
