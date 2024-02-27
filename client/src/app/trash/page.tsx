@@ -131,11 +131,10 @@ function Trash() {
     dateStyle: "full",
     timeStyle: "short",
   });
-  const filteredSearchTrash: NoteTrashData[] | undefined = getTrash.data.filter(
-    (trash: NoteTrashData) => {
+  const filteredSearchTrash: NoteTrashData[] | undefined =
+    getTrash.data?.filter((trash: NoteTrashData) => {
       return new RegExp(searchTrash as string, "i").test(trash.title);
-    }
-  );
+    });
   return (
     <div className="w-full h-screen px-3 relative">
       <div className="w-full rounded-md h-[45px] shadow shadow-black mt-[3rem] md:mt-[1.5rem] gap-2 flex items-center px-2 relative z-10">
@@ -178,13 +177,13 @@ function Trash() {
               <AlertDialogTrigger>
                 {" "}
                 <button
-                  disabled={getTrash.data.length === 0}
+                  disabled={getTrash.data?.length === 0}
                   className="text-sm px-6 py-2 bg-[#2E2E2E] lg:block hidden text-white rounded-lg disabled:bg-slate-400"
                 >
                   Empty Trash
                 </button>
                 <button
-                  disabled={getTrash.data.length === 0}
+                  disabled={getTrash.data?.length === 0}
                   className="text-lg px-4 py-2 bg-[#101012] lg:hidden block text-white rounded-lg disabled:bg-slate-400"
                 >
                   <MdOutlineDeleteSweep />
@@ -194,9 +193,9 @@ function Trash() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>
                     Are you sure you want to delete{" "}
-                    {getTrash.data.length <= 1 ? "this" : "these"}{" "}
-                    {getTrash.data.length}{" "}
-                    {getTrash.data.length <= 1 ? "note" : "notes"}?
+                    {getTrash.data?.length <= 1 ? "this" : "these"}{" "}
+                    {getTrash.data?.length}{" "}
+                    {getTrash.data?.length <= 1 ? "note" : "notes"}?
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete

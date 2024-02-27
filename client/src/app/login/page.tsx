@@ -12,6 +12,7 @@ import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { utilStore } from "@/store/util.store";
+import { useMutation } from "@tanstack/react-query";
 interface Data {
   username: string;
   password: string;
@@ -58,6 +59,27 @@ function Login() {
       setLoading(false);
     }
   }
+  // const signUpMutation = useMutation({
+  //   mutationFn: async (data: Data) => {
+  //     const response = await axios.post(
+  //       "http://localhost:5000/auth/login",
+  //       data,
+  //       {
+  //         headers: { "Content-Type": "application/json" },
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     return response.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     toast.success(data.message, {
+  //       position: matches ? "bottom-right" : "top-center",
+  //     });
+  //     localStorage.setItem("userToken", data.token);
+  //     setCurrentUser();
+  //     router.push("/notes");
+  //   },
+  // });
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form

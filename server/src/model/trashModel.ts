@@ -29,6 +29,12 @@ const trashSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date(),
   },
+  startDate: {
+    type: Number,
+  },
+  endDate: {
+    type: Number,
+  },
 });
 
 export const Trash = mongoose.model("trashes", trashSchema);

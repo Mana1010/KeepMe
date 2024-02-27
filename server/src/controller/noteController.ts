@@ -3,7 +3,12 @@ import asyncHandler from "express-async-handler";
 import { Notes, NotesDocument } from "../model/noteModel";
 import { Trash } from "../model/trashModel";
 import { Archive } from "../model/archiveModel";
-
+import {
+  addDays,
+  addSeconds,
+  differenceInDays,
+  differenceInSeconds,
+} from "date-fns";
 export const addNote = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) {
     res.status(401);
@@ -81,7 +86,6 @@ export const editNotes = asyncHandler(async (req: Request, res: Response) => {
   if (title !== editNote.title || content !== editNote.content) {
     editNote.updatedAt = new Date();
   }
-  console.log(title, editNote.title);
   editNote.title = title;
   editNote.content = content;
   editNote.isBold = isBold;
@@ -182,6 +186,8 @@ export const deleteNote = asyncHandler(async (req: Request, res: Response) => {
     owner: getNote.owner,
     createdAt: getNote.createdAt,
     updatedAt: getNote.updatedAt,
+    startDate: new Date().getTime(),
+    endDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
   });
   res.status(202).json({ message: "Your note is being moved to the Trash" });
 });
@@ -197,10 +203,19 @@ export const getTrashNote = asyncHandler(
     })
       .sort({ createdTrashAt: -1 })
       .lean();
+    await Trash.updateMany({
+      startDate: new Date().getTime(),
+    });
     if (!getAllTrashNote) {
       res.status(200).json({ message: [] });
       return;
     }
+    const filteredExpiredTrash = getAllTrashNote.filter(
+      (trash) => trash?.startDate! > trash?.endDate!
+    );
+    const mappedId = filteredExpiredTrash.map((expired) => expired.noteId);
+    await Trash.deleteMany({ noteId: { $in: mappedId } });
+
     res.status(200).json({ message: getAllTrashNote });
   }
 );

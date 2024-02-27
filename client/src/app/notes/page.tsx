@@ -55,7 +55,7 @@ function Notes() {
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
-  const { setCurrentUser } = utilStore();
+  const { setCurrentUser, currentUser } = utilStore();
   console.log(new Date());
   useEffect(() => {
     async function checkTokens() {
@@ -103,7 +103,7 @@ function Notes() {
   const mutatePinNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axios.patch(
-        `http://localhost:5000/user/notes/pin/${data._id}`,
+        `http://localhost:5000/user/notes/pin/${data.noteId}`,
         { isPinned: !data.isPinned },
         {
           headers: {
@@ -129,7 +129,7 @@ function Notes() {
   const mutateFavoriteNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axios.patch(
-        `http://localhost:5000/user/notes/favorite/${data._id}`,
+        `http://localhost:5000/user/notes/favorite/${data.noteId}`,
         { isFavorite: !data.isFavorite },
         {
           headers: {

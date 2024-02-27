@@ -64,6 +64,18 @@ function Sidebar() {
       return response.data.message;
     },
   });
+  const getTrash = useQuery({
+    queryKey: ["trashes"],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:5000/user/trashes", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
+      return response.data.message;
+    },
+  });
 
   return (
     <div
@@ -120,15 +132,22 @@ function Sidebar() {
           </Link>
           <Link href={"/trash"}>
             <div
-              className={`flex gap-2 w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold ${
+              className={`flex gap-2 w-full items-center text-[#120C18] p-2 hover:bg-[#120C18] hover:text-white active:bg-[#120C18] active:text-white font-semibold justify-between ${
                 pathname === "/trash" && "bg-[#120C18] text-white"
               }`}
             >
-              <span>
+              <div className="flex gap-2">
                 {" "}
-                <CiTrash />
-              </span>
-              <small>TRASH</small>
+                <span>
+                  {" "}
+                  <CiTrash />
+                </span>
+                <small>TRASH</small>
+              </div>
+
+              <div className={`${!currentUser && "hidden"} block`}>
+                <small className="font-semibold">{getTrash.data?.length}</small>
+              </div>
             </div>
           </Link>
         </ul>
