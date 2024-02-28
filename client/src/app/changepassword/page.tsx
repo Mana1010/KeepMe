@@ -1,28 +1,33 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import changpasswordIcon from "../components/img/changpasswordIcon.png";
 import Image from "next/image";
-import { MdScheduleSend, MdOutlinePublishedWithChanges } from "react-icons/md";
+import { MdOutlinePublishedWithChanges } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { TbArrowsExchange } from "react-icons/tb";
+import { useMutation } from "@tanstack/react-query";
+import checkToken from "@/utils/checkToken";
+import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
+import Alert from "@/components/ui/ExpiredToken";
 export interface Data {
   password: string;
   newpassword: string;
   confirmpassword: string;
 }
 function ChangePassword() {
-  const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
+  const { setCurrentUser } = utilStore();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
 
-  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset, formState, watch } = useForm<Data>({
     defaultValues: {
       password: "",
@@ -31,10 +36,10 @@ function ChangePassword() {
     },
   });
   const { errors } = formState;
-  async function formSubmit(data: Data) {
-    try {
-      setLoading(true);
-      const url = await axios.patch(
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: Data) => {
+      const response = await axios.patch(
         "http://localhost:5000/auth/changepassword",
         data,
         {
@@ -44,23 +49,42 @@ function ChangePassword() {
           withCredentials: true,
         }
       );
-      if (url.status === 200) {
-        reset();
-        router.refresh();
-        toast.success(url.data.message, {
-          position: matches ? "bottom-right" : "top-center",
-        });
-      }
-    } catch (err: any) {
-      console.log(err);
-      toast.error(err.response?.data.message && err.response.data.message, {
+      return response.data.message;
+    },
+    onSuccess: (data) => {
+      reset();
+      toast.success(data, {
         position: matches ? "bottom-right" : "top-center",
       });
-    } finally {
-      setLoading(false);
-    }
+    },
+    onError: (err: any) => {
+      toast.error(err.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+  function formSubmit(data: Data) {
+    changePasswordMutation.mutate(data);
   }
-
+  useEffect(() => {
+    async function checkTokens() {
+      const token = localStorage.getItem("userToken");
+      if (token) {
+        if (!(await checkToken())) {
+          setOpenAlert(true);
+          setCurrentUser();
+          return;
+        }
+      } else {
+        router.push(
+          `/login?${new URLSearchParams({
+            message: "You are not log in yet!",
+          })}`
+        );
+      }
+    }
+    checkTokens();
+  }, []);
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form
@@ -179,14 +203,18 @@ function ChangePassword() {
         </div>
         <div className="w-full flex justify-end pt-8 pr-2">
           <button
-            disabled={loading}
+            disabled={changePasswordMutation.isPending}
             type="submit"
             className="text-end px-5 flex items-center gap-2 rounded-sm text-white bg-[#120C18] py-2"
           >
-            <span>{loading ? "CHANGING PASSWORD" : "CHANGE PASSWORD"}</span>
+            <span>
+              {changePasswordMutation.isPending
+                ? "CHANGING PASSWORD"
+                : "CHANGE PASSWORD"}
+            </span>
             <span>
               {" "}
-              {loading ? (
+              {changePasswordMutation.isPending ? (
                 <MdOutlinePublishedWithChanges />
               ) : (
                 <TbArrowsExchange />
@@ -201,6 +229,7 @@ function ChangePassword() {
         priority
         className="lg:block hidden w-[80%]"
       />
+      {openAlert && <Alert />}
     </div>
   );
 }

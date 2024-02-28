@@ -10,6 +10,7 @@ import { MdScheduleSend, MdSend } from "react-icons/md";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 export interface Data {
   email: string;
   username: string;
@@ -34,28 +35,56 @@ function Signup() {
   const { errors } = formState;
   const [user, setUserData] = useState({} as Data);
 
-  async function formSubmit(data: Data) {
-    setUserData(data);
-    try {
-      setLoading(true);
-      const url = await axios.post("http://localhost:5000/auth/signup", data, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
-      if (url.status === 201) {
-        toast.success(url.data.message as React.ReactNode, {
-          position: matches ? "bottom-right" : "top-center",
-        });
-        reset();
-        router.push("/login");
-      }
-    } catch (err: any) {
-      toast.success(err.response.data.message, {
+  // async function formSubmit(data: Data) {
+  //   setUserData(data);
+  //   try {
+  //     setLoading(true);
+  //     const url = await axios.post("http://localhost:5000/auth/signup", data, {
+  //       headers: { "Content-Type": "application/json" },
+  //       withCredentials: true,
+  //     });
+  //     if (url.status === 201) {
+  //       toast.success(url.data.message as React.ReactNode, {
+  //         position: matches ? "bottom-right" : "top-center",
+  //       });
+  //       reset();
+  //       router.push("/login");
+  //     }
+  //   } catch (err: any) {
+  //     toast.success(err.response.data.message, {
+  //       position: matches ? "bottom-right" : "top-center",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+  const signupMutation = useMutation({
+    mutationFn: async (data: Data) => {
+      const response = await axios.post(
+        "http://localhost:5000/auth/signup",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      return response.data.message;
+    },
+    onSuccess: (data) => {
+      toast.success(data, {
         position: matches ? "bottom-right" : "top-center",
       });
-    } finally {
-      setLoading(false);
-    }
+      reset();
+      router.push("/login");
+    },
+    onError: (err: any) => {
+      toast.error(err.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+  function formSubmit(data: Data) {
+    signupMutation.mutate(data);
   }
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
@@ -80,7 +109,7 @@ function Signup() {
               EMAIL ADDRESS
             </label>
             <input
-              disabled={loading}
+              disabled={signupMutation.isPending}
               required
               {...register("email")}
               type="email"
@@ -96,7 +125,7 @@ function Signup() {
               USERNAME
             </label>
             <input
-              disabled={loading}
+              disabled={signupMutation.isPending}
               required
               {...register("username")}
               type="text"
@@ -113,7 +142,7 @@ function Signup() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
-                disabled={loading}
+                disabled={signupMutation.isPending}
                 required
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -152,7 +181,7 @@ function Signup() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
-                disabled={loading}
+                disabled={signupMutation.isPending}
                 required
                 type={showConPassword ? "text" : "password"}
                 autoComplete="off"
@@ -189,12 +218,15 @@ function Signup() {
         </div>
         <div className="w-full flex justify-end pt-8 pr-2">
           <button
-            disabled={loading}
+            disabled={signupMutation.isPending}
             type="submit"
             className="text-end px-5 flex items-center gap-2 rounded-sm text-white bg-[#120C18] py-2"
           >
-            <span>{loading ? "SUBMITTING" : "REGISTER"}</span>
-            <span> {loading ? <MdScheduleSend /> : <MdSend />}</span>
+            <span>{signupMutation.isPending ? "SUBMITTING" : "REGISTER"}</span>
+            <span>
+              {" "}
+              {signupMutation.isPending ? <MdScheduleSend /> : <MdSend />}
+            </span>
           </button>
         </div>
       </form>

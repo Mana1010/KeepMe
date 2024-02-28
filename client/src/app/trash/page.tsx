@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { PiBellSimpleRinging } from "react-icons/pi";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -16,6 +16,9 @@ import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
 import { NoteData } from "../notes/page";
 import noResult from "../components/img/no-result-found.png";
 import Image from "next/image";
+import checkToken from "@/utils/checkToken";
+import { utilStore } from "@/store/util.store";
+import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -39,11 +42,35 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import Alert from "@/components/ui/ExpiredToken";
 interface NoteTrashData extends NoteData {
   createdTrashAt: string;
 }
 function Trash() {
+  const router = useRouter();
+  const { setCurrentUser } = utilStore();
+  const [openAlert, setOpenAlert] = useState(false);
   const queryClient = useQueryClient();
+  const [searchTrash, setSearchedTrash] = useState<string>("");
+  useEffect(() => {
+    async function checkTokens() {
+      const token = localStorage.getItem("userToken");
+      if (token) {
+        if (!(await checkToken())) {
+          setOpenAlert(true);
+          setCurrentUser();
+          return;
+        }
+      } else {
+        router.push(
+          `/login?${new URLSearchParams({
+            message: "You are not log in yet!",
+          })}`
+        );
+      }
+    }
+    checkTokens();
+  }, []);
   const getTrash = useQuery({
     queryKey: ["trash"],
     queryFn: async () => {
@@ -119,8 +146,7 @@ function Trash() {
       toast.error(err.response.data.message);
     },
   });
-  const [searchTrash, setSearchedTrash] = useState<string>("");
-  console.log(searchTrash);
+
   if (getTrash.isLoading) {
     return <Loading>Your Trash is Loading...</Loading>;
   }
@@ -174,20 +200,30 @@ function Trash() {
               </p>
             </div>
             <AlertDialog>
-              <AlertDialogTrigger>
+              <AlertDialogTrigger
+                style={{
+                  pointerEvents: getTrash.data?.length === 0 ? "none" : "auto",
+                }}
+              >
                 {" "}
-                <button
-                  disabled={getTrash.data?.length === 0}
-                  className="text-sm px-6 py-2 bg-[#2E2E2E] lg:block hidden text-white rounded-lg disabled:bg-slate-400"
+                <span
+                  className={`text-sm px-6 py-2 lg:block hidden text-white rounded-lg ${
+                    getTrash.data?.length === 0
+                      ? "bg-slate-400"
+                      : "bg-[#2e2e2e]"
+                  }`}
                 >
                   Empty Trash
-                </button>
-                <button
-                  disabled={getTrash.data?.length === 0}
-                  className="text-lg px-4 py-2 bg-[#101012] lg:hidden block text-white rounded-lg disabled:bg-slate-400"
+                </span>
+                <span
+                  className={`text-lg px-4 py-2 lg:hidden block text-white rounded-lg ${
+                    getTrash.data?.length === 0
+                      ? "bg-slate-400"
+                      : "bg-[#2e2e2e]"
+                  }`}
                 >
                   <MdOutlineDeleteSweep />
-                </button>
+                </span>
               </AlertDialogTrigger>
               <AlertDialogContent className="bg-[#101012] text-white">
                 <AlertDialogHeader>
@@ -270,13 +306,13 @@ function Trash() {
                     </button>
                     <AlertDialog>
                       <AlertDialogTrigger>
-                        <button
+                        <span
                           className="hidden md:inline text-lg"
 
                           // onClick={() => deleteNote.mutate(filteredNote)}
                         >
                           <LiaTrashAlt />
-                        </button>
+                        </span>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-[#101012] text-white">
                         <AlertDialogHeader>
@@ -302,9 +338,9 @@ function Trash() {
                     </AlertDialog>
                     <Popover>
                       <PopoverTrigger>
-                        <button className="hidden md:inline text-lg">
+                        <span className="hidden md:inline text-lg">
                           <CiCircleInfo />
-                        </button>
+                        </span>
                       </PopoverTrigger>
                       <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
                         <h1>NOTE DETAILS</h1>
@@ -378,9 +414,9 @@ function Trash() {
                     </Menubar>
                     <Popover>
                       <PopoverTrigger>
-                        <button className="cursor-pointer font-primary p-2 flex gap-2">
+                        <span className="cursor-pointer font-primary p-2 flex gap-2">
                           <CiCircleInfo />
-                        </button>
+                        </span>
                       </PopoverTrigger>
                       <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
                         <h1>NOTE DETAILS</h1>
@@ -466,13 +502,13 @@ function Trash() {
                     </button>
                     <AlertDialog>
                       <AlertDialogTrigger>
-                        <button
+                        <span
                           className="hidden md:inline text-lg"
 
                           // onClick={() => deleteNote.mutate(filteredNote)}
                         >
                           <LiaTrashAlt />
-                        </button>
+                        </span>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-[#101012] text-white">
                         <AlertDialogHeader>
@@ -498,9 +534,9 @@ function Trash() {
                     </AlertDialog>
                     <Popover>
                       <PopoverTrigger>
-                        <button className="hidden md:inline text-lg">
+                        <span className="hidden md:inline text-lg">
                           <CiCircleInfo />
-                        </button>
+                        </span>
                       </PopoverTrigger>
                       <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
                         <h1>NOTE DETAILS</h1>
@@ -574,9 +610,9 @@ function Trash() {
                     </Menubar>
                     <Popover>
                       <PopoverTrigger>
-                        <button className="cursor-pointer font-primary p-2 flex gap-2">
+                        <span className="cursor-pointer font-primary p-2 flex gap-2">
                           <CiCircleInfo />
-                        </button>
+                        </span>
                       </PopoverTrigger>
                       <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
                         <h1>NOTE DETAILS</h1>
@@ -601,6 +637,7 @@ function Trash() {
           </div>
         )}
       </div>
+      {openAlert && <Alert />}
     </div>
   );
 }

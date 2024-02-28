@@ -10,7 +10,6 @@ const checkToken = async () => {
   const getAccessToken = localStorage.getItem("userToken");
 
   if (!getAccessToken) {
-    console.log("No user exist");
     return false;
   }
   try {

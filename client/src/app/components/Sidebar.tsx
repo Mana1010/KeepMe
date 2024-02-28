@@ -18,7 +18,6 @@ import { useMediaQuery } from "usehooks-ts";
 import axios from "axios";
 import { NoteData } from "../notes/page";
 import { useQuery } from "@tanstack/react-query";
-import { MdOutlineExposurePlus1 } from "react-icons/md";
 function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -26,10 +25,7 @@ function Sidebar() {
     utilStore() as State;
   const matches = useMediaQuery("(min-width: 640px)");
   useEffect(() => {
-    function fetchData() {
-      setCurrentUser();
-    }
-    fetchData();
+    setCurrentUser();
   }, []);
   async function logOutMe() {
     try {
@@ -76,7 +72,6 @@ function Sidebar() {
       return response.data.message;
     },
   });
-
   return (
     <div
       className={`absolute h-screen md:w-[270px] w-[70%] sm:w-[50%] md:relative md:shadow-md md:shadow-black/50 transition-all ease-out duration-500 ${

@@ -55,8 +55,7 @@ function Notes() {
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
-  const { setCurrentUser, currentUser } = utilStore();
-  console.log(new Date());
+  const { setCurrentUser } = utilStore();
   useEffect(() => {
     async function checkTokens() {
       const token = localStorage.getItem("userToken");
@@ -334,9 +333,9 @@ function Notes() {
                         </button>
                         <Popover>
                           <PopoverTrigger>
-                            <button className="hidden md:inline">
+                            <span className="hidden md:inline">
                               <CiCircleInfo />
-                            </button>
+                            </span>
                           </PopoverTrigger>
                           <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
                             <h1>NOTE DETAILS</h1>
@@ -407,9 +406,9 @@ function Notes() {
                         </Menubar>
                         <Popover>
                           <PopoverTrigger>
-                            <button className="cursor-pointer font-primary p-2 flex gap-2">
+                            <span className="cursor-pointer font-primary p-2 flex gap-2">
                               <CiCircleInfo />
-                            </button>
+                            </span>
                           </PopoverTrigger>
                           <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
                             <h1>NOTE DETAILS</h1>
@@ -504,9 +503,9 @@ function Notes() {
                       </button>
                       <Popover>
                         <PopoverTrigger>
-                          <button className="hidden md:inline">
+                          <span className="hidden md:inline">
                             <CiCircleInfo />
-                          </button>
+                          </span>
                         </PopoverTrigger>
                         <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
                           <h1>NOTE DETAILS</h1>
@@ -571,9 +570,9 @@ function Notes() {
                       </Menubar>
                       <Popover>
                         <PopoverTrigger>
-                          <button className="cursor-pointer font-primary p-2 flex gap-2">
+                          <span className="cursor-pointer font-primary p-2 flex gap-2">
                             <CiCircleInfo />
-                          </button>
+                          </span>
                         </PopoverTrigger>
                         <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
                           <h1>NOTE DETAILS</h1>
@@ -706,9 +705,9 @@ function Notes() {
                       </button>
                       <Popover>
                         <PopoverTrigger>
-                          <button className="hidden md:inline">
+                          <span className="hidden md:inline">
                             <CiCircleInfo />
-                          </button>
+                          </span>
                         </PopoverTrigger>
                         <PopoverContent className="bg-[#0A0F13] text-white w-[400px] z-50 flex flex-col">
                           <h1>NOTE DETAILS</h1>
@@ -773,9 +772,9 @@ function Notes() {
                       </Menubar>
                       <Popover>
                         <PopoverTrigger>
-                          <button className="cursor-pointer font-primary p-2 flex gap-2">
+                          <span className="cursor-pointer font-primary p-2 flex gap-2">
                             <CiCircleInfo />
-                          </button>
+                          </span>
                         </PopoverTrigger>
                         <PopoverContent className="bg-[#0A0F13] text-white z-50 flex flex-col">
                           <h1>NOTE DETAILS</h1>

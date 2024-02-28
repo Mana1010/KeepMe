@@ -23,63 +23,73 @@ function Login() {
   const router = useRouter();
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm<Data>({
     defaultValues: {
       username: "",
       password: "",
     },
   });
-  async function formSubmit(data: Data) {
-    try {
-      setLoading(true);
-      const url = await axios.post("http://localhost:5000/auth/login", data, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
-      if (url.status === 200) {
-        toast.success(url.data.message, {
-          position: matches ? "bottom-right" : "top-center",
-        });
-        localStorage.setItem("userToken", url.data.token);
-        reset();
-        setCurrentUser();
-        router.push("/notes");
-      }
-    } catch (err: any) {
-      toast.error(
-        err.response?.data.message
-          ? err.response.data.message
-          : "Error while logging in, please try again",
-        {
-          position: matches ? "bottom-right" : "top-center",
-        }
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-  // const signUpMutation = useMutation({
-  //   mutationFn: async (data: Data) => {
-  //     const response = await axios.post(
-  //       "http://localhost:5000/auth/login",
-  //       data,
+  // async function formSubmit(data: Data) {
+  //   try {
+  //     setLoading(true);
+  //     const url = await axios.post("http://localhost:5000/auth/login", data, {
+  //       headers: { "Content-Type": "application/json" },
+  //       withCredentials: true,
+  //     });
+  //     if (url.status === 200) {
+  //       toast.success(url.data.message, {
+  //         position: matches ? "bottom-right" : "top-center",
+  //       });
+  //       localStorage.setItem("userToken", url.data.token);
+  //       reset();
+  //       setCurrentUser();
+  //       router.push("/notes");
+  //     }
+  //   } catch (err: any) {
+  //     toast.error(
+  //       err.response?.data.message
+  //         ? err.response.data.message
+  //         : "Error while logging in, please try again",
   //       {
-  //         headers: { "Content-Type": "application/json" },
-  //         withCredentials: true,
+  //         position: matches ? "bottom-right" : "top-center",
   //       }
   //     );
-  //     return response.data;
-  //   },
-  //   onSuccess: (data) => {
-  //     toast.success(data.message, {
-  //       position: matches ? "bottom-right" : "top-center",
-  //     });
-  //     localStorage.setItem("userToken", data.token);
-  //     setCurrentUser();
-  //     router.push("/notes");
-  //   },
-  // });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: Data) => {
+      const response = await axios.post(
+        "http://localhost:5000/auth/login",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("userToken", data.token);
+      toast.success(data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+      setCurrentUser();
+      reset();
+      router.push("/notes");
+    },
+    onError: (err: any) => {
+      console.log(err.response);
+      toast.error(err.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
+    },
+  });
+  function formSubmit(data: Data) {
+    loginMutation.mutate(data);
+  }
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form
@@ -100,7 +110,7 @@ function Login() {
               USERNAME
             </label>
             <input
-              disabled={loading}
+              disabled={loginMutation.isPending}
               required
               {...register("username")}
               type="text"
@@ -117,7 +127,7 @@ function Login() {
             </label>
             <div className="border-[1px] border-[#120C18] outline-none px-2 h-10 placeholder:text-[#120C18]/80 flex justify-between">
               <input
-                disabled={loading}
+                disabled={loginMutation.isPending}
                 required
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -145,12 +155,17 @@ function Login() {
         </div>
         <div className="w-full flex justify-end pt-8 pr-2">
           <button
-            disabled={loading}
+            disabled={loginMutation.isPending}
             type="submit"
             className="text-end px-5 flex items-center gap-2 rounded-sm text-white bg-[#120C18] py-2"
           >
-            <span>{loading ? "AUTHENTICATING" : "AUTHENTICATE"}</span>
-            <span> {loading ? <MdScheduleSend /> : <MdSend />}</span>
+            <span>
+              {loginMutation.isPending ? "AUTHENTICATING" : "AUTHENTICATE"}
+            </span>
+            <span>
+              {" "}
+              {loginMutation.isPending ? <MdScheduleSend /> : <MdSend />}
+            </span>
           </button>
         </div>
       </form>
