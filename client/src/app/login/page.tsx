@@ -81,7 +81,6 @@ function Login() {
       router.push("/notes");
     },
     onError: (err: any) => {
-      console.log(err.response);
       toast.error(err.response.data.message, {
         position: matches ? "bottom-right" : "top-center",
       });

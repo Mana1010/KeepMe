@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import changpasswordIcon from "../components/img/changpasswordIcon.png";
 import Image from "next/image";
@@ -10,19 +9,17 @@ import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { TbArrowsExchange } from "react-icons/tb";
 import { useMutation } from "@tanstack/react-query";
-import checkToken from "@/utils/checkToken";
-import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
 import Alert from "@/components/ui/ExpiredToken";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
 export interface Data {
   password: string;
   newpassword: string;
   confirmpassword: string;
 }
 function ChangePassword() {
+  const axiosIntercept = useAxiosIntercept();
   const matches = useMediaQuery("(min-width: 640px)");
-  const { setCurrentUser } = utilStore();
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
@@ -39,15 +36,9 @@ function ChangePassword() {
 
   const changePasswordMutation = useMutation({
     mutationFn: async (data: Data) => {
-      const response = await axios.patch(
+      const response = await axiosIntercept.patch(
         "http://localhost:5000/auth/changepassword",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          },
-          withCredentials: true,
-        }
+        data
       );
       return response.data.message;
     },
@@ -66,25 +57,6 @@ function ChangePassword() {
   function formSubmit(data: Data) {
     changePasswordMutation.mutate(data);
   }
-  useEffect(() => {
-    async function checkTokens() {
-      const token = localStorage.getItem("userToken");
-      if (token) {
-        if (!(await checkToken())) {
-          setOpenAlert(true);
-          setCurrentUser();
-          return;
-        }
-      } else {
-        router.push(
-          `/login?${new URLSearchParams({
-            message: "You are not log in yet!",
-          })}`
-        );
-      }
-    }
-    checkTokens();
-  }, []);
   return (
     <div className="grid w-full h-screen grid-cols-1 lg:grid-cols-2 items-center px-5 justify-end">
       <form

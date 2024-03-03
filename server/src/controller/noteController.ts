@@ -108,7 +108,7 @@ export const editNotePin = asyncHandler(async (req: Request, res: Response) => {
   const editNotePin = await Notes.findOne({ noteId: id });
   if (!editNotePin) {
     res.status(404);
-    throw new Error("Note is not found");
+    throw new Error("Note not found");
   }
   editNotePin.isPinned = isPinned;
   await editNotePin.save();

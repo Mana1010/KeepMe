@@ -2,14 +2,13 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import Alert from "@/components/ui/ExpiredToken";
-import checkToken from "@/utils/checkToken";
+// import checkToken from "@/utils/checkToken";
 import { useRouter } from "next/navigation";
 import { utilStore } from "@/store/util.store";
 import { CiSearch } from "react-icons/ci";
 import { FaPlus, FaCirclePlus } from "react-icons/fa6";
 import AddNote from "../components/Notes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast as toaster } from "sonner";
 import { UserNote } from "@/store/note.store";
 import { TbNotes } from "react-icons/tb";
@@ -27,6 +26,7 @@ import { MdOutlinePushPin } from "react-icons/md";
 import { MdOutlineHeartBroken } from "react-icons/md";
 import noResult from "../components/img/no-result-found.png";
 import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
 import {
   Popover,
   PopoverContent,
@@ -50,31 +50,12 @@ export interface NoteData extends UserNote {
   noteId: string;
 }
 function Notes() {
+  const axiosIntercept = useAxiosIntercept();
   const matches = useMediaQuery("(min-width: 640px)");
-  const [openAlert, setOpenAlert] = useState(false);
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
-  const { setCurrentUser } = utilStore();
-  useEffect(() => {
-    async function checkTokens() {
-      const token = localStorage.getItem("userToken");
-      if (token) {
-        if (!(await checkToken())) {
-          setOpenAlert(true);
-          setCurrentUser();
-          return;
-        }
-      } else {
-        router.push(
-          `/login?${new URLSearchParams({
-            message: "You are not log in yet!",
-          })}`
-        );
-      }
-    }
-    checkTokens();
-  }, []);
+  const { setCurrentUser, openAlert } = utilStore();
   const {
     isError,
     error,
@@ -89,19 +70,22 @@ function Notes() {
   } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/user/notes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosIntercept.get(
+        "http://localhost:5000/user/notes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
       return response.data.message;
     },
   });
   const queryClient = useQueryClient();
   const mutatePinNote = useMutation({
     mutationFn: async (data: NoteData) => {
-      const response = await axios.patch(
+      const response = await axiosIntercept.patch(
         `http://localhost:5000/user/notes/pin/${data.noteId}`,
         { isPinned: !data.isPinned },
         {
@@ -120,14 +104,14 @@ function Notes() {
       });
     },
     onError: (error: any) => {
-      toaster.error(error.response.data.message, {
+      toaster.error(error.response?.data?.message, {
         position: matches ? "bottom-right" : "top-center",
       });
     },
   });
   const mutateFavoriteNote = useMutation({
     mutationFn: async (data: NoteData) => {
-      const response = await axios.patch(
+      const response = await axiosIntercept.patch(
         `http://localhost:5000/user/notes/favorite/${data.noteId}`,
         { isFavorite: !data.isFavorite },
         {
@@ -153,7 +137,7 @@ function Notes() {
   });
   const deleteNote = useMutation({
     mutationFn: async (data: NoteData) => {
-      const response = await axios.delete(
+      const response = await axiosIntercept.delete(
         `http://localhost:5000/user/notes/${data.noteId}`,
         {
           headers: {
@@ -176,9 +160,7 @@ function Notes() {
       });
     },
   });
-  if (isError) {
-    toaster.error(error.response.data.message);
-  }
+
   if (isLoading) {
     return <Loading>Your Notes is Loading...</Loading>;
   }
@@ -193,6 +175,7 @@ function Notes() {
     dateStyle: "full",
     timeStyle: "short",
   });
+
   return (
     <div className="h-screen w-full px-4 py-2 relative">
       <div className="flex justify-between items-center w-full md:pt-0 pt-[35px]">
@@ -207,7 +190,7 @@ function Notes() {
         </div>
       </div>
       <div className="w-full rounded-md h-[45px] flex shadow shadow-black mt-2 gap-2 items-center px-2 relative z-10">
-        <label htmlFor="search" className=" text-xl px-1">
+        <label htmlFor="searchbox-notes" className=" text-xl px-1">
           {" "}
           <CiSearch />
         </label>
@@ -217,7 +200,7 @@ function Notes() {
           }}
           value={searchedNoteTitle as string}
           autoComplete="off"
-          id="search"
+          id="searchbox-notes"
           type="text"
           placeholder="Search your Notes"
           className="outline-none bg-transparent caret-black w-[95%]"

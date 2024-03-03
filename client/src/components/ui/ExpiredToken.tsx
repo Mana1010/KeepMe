@@ -1,9 +1,12 @@
 "use client";
 import React from "react";
 import Router, { useRouter } from "next/navigation";
+import { utilStore } from "@/store/util.store";
 function Alert() {
   const router = useRouter();
+  const { setOpenAlert } = utilStore();
   function ok() {
+    setOpenAlert(false);
     router.push("/login");
   }
   return (

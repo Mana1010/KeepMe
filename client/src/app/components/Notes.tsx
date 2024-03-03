@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
 import { noteStore } from "@/store/note.store";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
 
 interface Data {
   setAddNote: any;
@@ -80,11 +81,12 @@ function AddNote({ setAddNote }: Data) {
       symbol: "✔",
     },
   ];
+  const axiosIntercept = useAxiosIntercept();
   const matches = useMediaQuery("(min-width: 640px)");
   const queryClient = useQueryClient();
   const mutateNote = useMutation({
     mutationFn: async () => {
-      const response = await axios.post(
+      const response = await axiosIntercept.post(
         "http://localhost:5000/user/notes",
         note,
         {

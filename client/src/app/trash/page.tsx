@@ -16,9 +16,10 @@ import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
 import { NoteData } from "../notes/page";
 import noResult from "../components/img/no-result-found.png";
 import Image from "next/image";
-import checkToken from "@/utils/checkToken";
+// import checkToken from "@/utils/checkToken";
 import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
 import {
   Popover,
   PopoverContent,
@@ -48,44 +49,28 @@ interface NoteTrashData extends NoteData {
 }
 function Trash() {
   const router = useRouter();
-  const { setCurrentUser } = utilStore();
+  const axiosIntercept = useAxiosIntercept();
   const [openAlert, setOpenAlert] = useState(false);
   const queryClient = useQueryClient();
   const [searchTrash, setSearchedTrash] = useState<string>("");
-  useEffect(() => {
-    async function checkTokens() {
-      const token = localStorage.getItem("userToken");
-      if (token) {
-        if (!(await checkToken())) {
-          setOpenAlert(true);
-          setCurrentUser();
-          return;
-        }
-      } else {
-        router.push(
-          `/login?${new URLSearchParams({
-            message: "You are not log in yet!",
-          })}`
-        );
-      }
-    }
-    checkTokens();
-  }, []);
   const getTrash = useQuery({
     queryKey: ["trash"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/user/trashes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosIntercept.get(
+        "http://localhost:5000/user/trashes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
       return response.data.message;
     },
   });
   const deleteAllTrash = useMutation({
     mutationFn: async () => {
-      const response = await axios.delete(
+      const response = await axiosIntercept.delete(
         "http://localhost:5000/user/trashes",
         {
           headers: {
@@ -106,7 +91,7 @@ function Trash() {
   });
   const deleteTrash = useMutation({
     mutationFn: async (data: NoteTrashData) => {
-      const response = await axios.delete(
+      const response = await axiosIntercept.delete(
         `http://localhost:5000/user/trashes/${data.noteId}`,
         {
           headers: {
@@ -127,7 +112,7 @@ function Trash() {
   });
   const restoreNote = useMutation({
     mutationFn: async (data: NoteTrashData) => {
-      const response = await axios.delete(
+      const response = await axiosIntercept.delete(
         `http://localhost:5000/user/trashes/restore/${data.noteId}`,
         {
           headers: {
@@ -164,7 +149,7 @@ function Trash() {
   return (
     <div className="w-full h-screen px-3 relative">
       <div className="w-full rounded-md h-[45px] shadow shadow-black mt-[3rem] md:mt-[1.5rem] gap-2 flex items-center px-2 relative z-10">
-        <label htmlFor="search" className=" text-xl px-1">
+        <label htmlFor="searchbox-trash" className=" text-xl px-1">
           {" "}
           <CiSearch />
         </label>
@@ -174,7 +159,7 @@ function Trash() {
           }}
           value={searchTrash as string}
           autoComplete="off"
-          id="search"
+          id="searchbox-trash"
           type="text"
           placeholder="Search your Trash"
           className="outline-none bg-transparent caret-black w-[95%]"

@@ -1,26 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
-import checkToken from "@/utils/checkToken";
 import Alert from "@/components/ui/ExpiredToken";
 import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
-
-import { noteStore } from "@/store/note.store";
 import { useMediaQuery } from "usehooks-ts";
 import Image from "next/image";
 import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
 import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
 import keeMeIcon from "../../components/img/keepMe-lightmode.png";
-import { MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
+import { MdKeyboardArrowDown } from "react-icons/md";
 import { LuPin, LuPinOff } from "react-icons/lu";
 import { GoHeart, GoHeartFill } from "react-icons/go";
-import { EditUserNote } from "@/store/edit.note.store";
 import { editNoteStore } from "@/store/edit.note.store";
-
+import useAxiosIntercept from "@/api/useAxiosIntercept";
 interface Param {
   params: {
     noteId: string;
@@ -90,12 +85,12 @@ function Note({ params }: Param) {
     dateStyle: "full",
     timeStyle: "short",
   });
+  const axiosIntercept = useAxiosIntercept();
   const [openAlert, setOpenAlert] = useState(false);
-  const { setCurrentUser } = utilStore();
   const router = useRouter();
   const editNote = useMutation({
     mutationFn: async () => {
-      const response = await axios.patch(
+      const response = await axiosIntercept.patch(
         `http://localhost:5000/user/notes/${params.noteId}`,
         editInfo,
         {
@@ -118,7 +113,7 @@ function Note({ params }: Param) {
   useQuery({
     queryKey: ["noteId"],
     queryFn: async () => {
-      const response = await axios.get(
+      const response = await axiosIntercept.get(
         `http://localhost:5000/user/notes/${params.noteId}`,
         {
           headers: {
@@ -128,7 +123,7 @@ function Note({ params }: Param) {
         }
       );
       setEditInfo(response.data.message);
-      return;
+      return response.data.message;
     },
   });
   const listFilter = typeList.find((type) => type.name === editInfo.listType);
@@ -142,25 +137,6 @@ function Note({ params }: Param) {
     }
     return;
   }, [editInfo.isListOpen]);
-  useEffect(() => {
-    async function checkTokens() {
-      const token = localStorage.getItem("userToken");
-      if (token) {
-        if (!(await checkToken())) {
-          setOpenAlert(true);
-          setCurrentUser();
-          return;
-        }
-      } else {
-        router.push(
-          `/login?${new URLSearchParams({
-            message: "You are not log in yet!",
-          })}`
-        );
-      }
-    }
-    checkTokens();
-  }, []);
   function puttingListSymbol(e: any) {
     const filterSymbols = typeList.find(
       (type) => type.name === editInfo.listType

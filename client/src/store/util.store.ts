@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import axios from "axios";
-import React from "react";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { createAxios } from "@/api/axiosIntercept";
 export interface State {
   openNavBar: boolean;
   currentUser: {
@@ -8,13 +8,17 @@ export interface State {
     email: string;
     username: string;
   } | null;
+  openAlert: boolean;
+  setOpenAlert: (bool: boolean) => void;
   setCurrentUser: () => Promise<void>;
   setOpenNavbar: () => void;
   logOut: () => Promise<void>;
 }
+
 const store = (set: any) => ({
   openNavBar: false,
   currentUser: null,
+  openAlert: false,
   setOpenNavbar: () => {
     set((state: State) => ({
       openNavBar: !state.openNavBar,
@@ -22,12 +26,15 @@ const store = (set: any) => ({
   },
   setCurrentUser: async () => {
     try {
-      const url = await axios.get("http://localhost:5000/auth/userDetails", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        withCredentials: true,
-      });
+      const url = await createAxios.get(
+        "http://localhost:5000/auth/userDetails",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
       if (url.status === 200) {
         set({ currentUser: url.data.message });
       }
@@ -35,13 +42,11 @@ const store = (set: any) => ({
       set({ currentUser: null });
     }
   },
+  setOpenAlert: async (bool: boolean) => {
+    set({ openAlert: bool });
+  },
   logOut: async () => {
-    await axios.post("http://localhost:5000/auth/logout", null, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-      },
-      withCredentials: true,
-    });
+    await createAxios.post("http://localhost:5000/auth/logout", null);
     set({
       currentUser: null,
     });

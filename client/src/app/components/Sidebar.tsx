@@ -18,15 +18,15 @@ import { useMediaQuery } from "usehooks-ts";
 import axios from "axios";
 import { NoteData } from "../notes/page";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosIntercept from "@/api/useAxiosIntercept";
+
 function Sidebar() {
+  const axiosIntercept = useAxiosIntercept();
   const router = useRouter();
   const pathname = usePathname();
-  const { openNavBar, setOpenNavbar, currentUser, setCurrentUser, logOut } =
+  const { openNavBar, setOpenNavbar, currentUser, logOut } =
     utilStore() as State;
   const matches = useMediaQuery("(min-width: 640px)");
-  useEffect(() => {
-    setCurrentUser();
-  }, []);
   async function logOutMe() {
     try {
       logOut();
@@ -51,26 +51,34 @@ function Sidebar() {
   } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/user/notes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosIntercept.get(
+        "http://localhost:5000/user/notes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
       return response.data.message;
     },
+    enabled: currentUser !== null,
   });
   const getTrash = useQuery({
     queryKey: ["trashes"],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/user/trashes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosIntercept.get(
+        "http://localhost:5000/user/trashes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
       return response.data.message;
     },
+    enabled: currentUser !== null,
   });
   return (
     <div

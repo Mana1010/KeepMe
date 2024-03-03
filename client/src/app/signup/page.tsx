@@ -105,7 +105,7 @@ function Signup() {
         </header>
         <div className="pt-3 px-2 space-y-2">
           <div className="space-y-1 flex flex-col">
-            <label htmlFor="username" className="font-semibold text-[0.7rem]">
+            <label htmlFor="email" className="font-semibold text-[0.7rem]">
               EMAIL ADDRESS
             </label>
             <input

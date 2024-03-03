@@ -3,7 +3,7 @@ import { UserNote } from "./note.store";
 import React from "react";
 import { TypeList } from "./note.store";
 export interface EditUserNote extends UserNote {
-  updatedAt: string;
+  updatedAt: string | null;
   _id: string;
 }
 interface StateEditInfo {
@@ -32,7 +32,18 @@ interface EditInfo extends StateEditInfo {
   removeDuplicateSymbols: (filterSymbols: TypeList | undefined) => void;
 }
 const store = (set: any) => ({
-  editInfo: {} as EditUserNote,
+  editInfo: {
+    title: "Untitled Note",
+    content: "",
+    isBold: false,
+    isItalic: false,
+    isFavorite: false,
+    isPinned: false,
+    isListOpen: false,
+    listType: "dot",
+    bgColor: "white",
+    updatedAt: null,
+  } as EditUserNote,
   openBg: false,
   openListStyle: false,
   setEditInfo: (editData: EditUserNote) => {

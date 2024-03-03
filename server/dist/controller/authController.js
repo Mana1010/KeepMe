@@ -64,7 +64,7 @@ exports.changePassword = (0, express_async_handler_1.default)(async (req, res) =
     }
     const passwordCompare = await bcrypt_1.default.compare(password, findUser.password);
     if (!passwordCompare) {
-        res.status(401);
+        res.status(400);
         throw new Error("Invalid current password, please try again");
     }
     findUser.password = await bcrypt_1.default.hash(newpassword, 16);
@@ -76,8 +76,7 @@ const verifyAccount = (req, res) => {
         res.status(200).json({ message: req.user });
     }
     else {
-        console.log("It is not working");
-        res.status(401).json({ message: "Error" });
+        res.status(400).json({ message: "Error" });
     }
 };
 exports.verifyAccount = verifyAccount;

@@ -64,7 +64,7 @@ export const changePassword = asyncHandler(
     }
     const passwordCompare = await bcrypt.compare(password, findUser.password);
     if (!passwordCompare) {
-      res.status(401);
+      res.status(400);
       throw new Error("Invalid current password, please try again");
     }
     findUser.password = await bcrypt.hash(newpassword, 16);
@@ -76,8 +76,7 @@ export const verifyAccount = (req: Request, res: Response) => {
   if (req.user) {
     res.status(200).json({ message: req.user });
   } else {
-    console.log("It is not working");
-    res.status(401).json({ message: "Error" });
+    res.status(400).json({ message: "Error" });
   }
 };
 export const newAccessToken = asyncHandler(
