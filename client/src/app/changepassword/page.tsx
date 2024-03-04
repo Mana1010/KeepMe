@@ -9,9 +9,9 @@ import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { TbArrowsExchange } from "react-icons/tb";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import Alert from "@/components/ui/ExpiredToken";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { utilStore } from "@/store/util.store";
 export interface Data {
   password: string;
   newpassword: string;
@@ -23,7 +23,7 @@ function ChangePassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
-  const [openAlert, setOpenAlert] = useState(false);
+  const { openAlert } = utilStore();
 
   const { register, handleSubmit, reset, formState, watch } = useForm<Data>({
     defaultValues: {

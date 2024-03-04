@@ -59,11 +59,7 @@ function useAxiosIntercept() {
         const status = error?.response.status;
         if (status === 403) {
           setOpenAlert(true);
-        } else if (status === 401) {
-          router.push(
-            "/login?" +
-              new URLSearchParams({ message: "You are not log in yet" })
-          );
+          return;
         }
         return Promise.reject(error);
       }

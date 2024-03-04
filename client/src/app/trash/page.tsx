@@ -48,9 +48,8 @@ interface NoteTrashData extends NoteData {
   createdTrashAt: string;
 }
 function Trash() {
-  const router = useRouter();
+  const { openAlert, currentUser } = utilStore();
   const axiosIntercept = useAxiosIntercept();
-  const [openAlert, setOpenAlert] = useState(false);
   const queryClient = useQueryClient();
   const [searchTrash, setSearchedTrash] = useState<string>("");
   const getTrash = useQuery({
@@ -134,9 +133,6 @@ function Trash() {
 
   if (getTrash.isLoading) {
     return <Loading>Your Trash is Loading...</Loading>;
-  }
-  if (getTrash.isError) {
-    toast.error(getTrash.error.message);
   }
   const dateFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: "full",
@@ -291,11 +287,7 @@ function Trash() {
                     </button>
                     <AlertDialog>
                       <AlertDialogTrigger>
-                        <span
-                          className="hidden md:inline text-lg"
-
-                          // onClick={() => deleteNote.mutate(filteredNote)}
-                        >
+                        <span className="hidden md:inline text-lg">
                           <LiaTrashAlt />
                         </span>
                       </AlertDialogTrigger>
