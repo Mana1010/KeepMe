@@ -28,7 +28,7 @@ app.use(errorHandler_1.default);
 async function getDb() {
     try {
         await mongoose_1.default.connect(process.env.MONGO_URI);
-        app.listen(5000, () => {
+        app.listen(process.env.PORT || 3000, () => {
             console.log("Server is listening!!!");
         });
     }
