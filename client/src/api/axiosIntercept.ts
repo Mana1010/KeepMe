@@ -12,7 +12,7 @@ const getToken =
     ? localStorage.getItem("userToken")
     : null;
 export const createAxios = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: "https://keep-me-app.vercel.app/",
   headers: {
     Authorization: `Bearer ${getToken}`,
   },
