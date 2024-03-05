@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Alert from "@/components/ui/ExpiredToken";
-import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
 import Image from "next/image";
@@ -16,6 +15,7 @@ import { LuPin, LuPinOff } from "react-icons/lu";
 import { GoHeart, GoHeartFill } from "react-icons/go";
 import { editNoteStore } from "@/store/edit.note.store";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { BASE_URL } from "@/utils/baseUrl";
 interface Param {
   params: {
     noteId: string;
@@ -91,7 +91,7 @@ function Note({ params }: Param) {
   const editNote = useMutation({
     mutationFn: async () => {
       const response = await axiosIntercept.patch(
-        `http://localhost:5000/user/notes/${params.noteId}`,
+        `${BASE_URL}/user/notes/${params.noteId}`,
         editInfo,
         {
           headers: {
@@ -103,18 +103,22 @@ function Note({ params }: Param) {
       return response.data.message;
     },
     onSuccess: (data) => {
-      toast.success(data);
+      toast.success(data, {
+        position: matches ? "bottom-right" : "top-center",
+      });
       router.push("/notes");
     },
     onError: (err) => {
-      toast.error(err.message);
+      toast.error(err.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
     },
   });
   useQuery({
     queryKey: ["noteId"],
     queryFn: async () => {
       const response = await axiosIntercept.get(
-        `http://localhost:5000/user/notes/${params.noteId}`,
+        `${BASE_URL}/user/notes/${params.noteId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,

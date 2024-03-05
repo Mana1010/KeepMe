@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
 import { createAxios } from "@/api/axiosIntercept";
+import { BASE_URL } from "@/utils/baseUrl";
 export interface State {
   openNavBar: boolean;
   currentUser: {
@@ -26,15 +27,12 @@ const store = (set: any) => ({
   },
   setCurrentUser: async () => {
     try {
-      const url = await createAxios.get(
-        "http://localhost:5000/auth/userDetails",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const url = await createAxios.get(`${BASE_URL}/auth/userDetails`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
       if (url.status === 200) {
         set({ currentUser: url.data.message });
       }
@@ -46,7 +44,12 @@ const store = (set: any) => ({
     set({ openAlert: bool });
   },
   logOut: async () => {
-    await createAxios.post("http://localhost:5000/auth/logout", null);
+    await createAxios.post(`${BASE_URL}/auth/logout`, null, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      },
+      withCredentials: true,
+    });
     set({
       currentUser: null,
     });

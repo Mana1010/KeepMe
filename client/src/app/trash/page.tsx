@@ -4,7 +4,6 @@ import { CiSearch } from "react-icons/ci";
 import { PiBellSimpleRinging } from "react-icons/pi";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import Loading from "@/components/ui/Loading";
 import { motion } from "framer-motion";
@@ -16,10 +15,10 @@ import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
 import { NoteData } from "../notes/page";
 import noResult from "../components/img/no-result-found.png";
 import Image from "next/image";
-// import checkToken from "@/utils/checkToken";
 import { utilStore } from "@/store/util.store";
-import { useRouter } from "next/navigation";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { useMediaQuery } from "usehooks-ts";
+import { BASE_URL } from "@/utils/baseUrl";
 import {
   Popover,
   PopoverContent,
@@ -48,36 +47,31 @@ interface NoteTrashData extends NoteData {
   createdTrashAt: string;
 }
 function Trash() {
-  const { openAlert, currentUser } = utilStore();
+  const matches = useMediaQuery("(min-width: 640px)");
+  const { openAlert } = utilStore();
   const axiosIntercept = useAxiosIntercept();
   const queryClient = useQueryClient();
   const [searchTrash, setSearchedTrash] = useState<string>("");
   const getTrash = useQuery({
     queryKey: ["trash"],
     queryFn: async () => {
-      const response = await axiosIntercept.get(
-        "http://localhost:5000/user/trashes",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axiosIntercept.get(`${BASE_URL}/user/trashes`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
       return response.data.message;
     },
   });
   const deleteAllTrash = useMutation({
     mutationFn: async () => {
-      const response = await axiosIntercept.delete(
-        "http://localhost:5000/user/trashes",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axiosIntercept.delete(`${BASE_URL}/user/trashes`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
       return response.data.message;
     },
     onSuccess: (data) => {
@@ -91,7 +85,7 @@ function Trash() {
   const deleteTrash = useMutation({
     mutationFn: async (data: NoteTrashData) => {
       const response = await axiosIntercept.delete(
-        `http://localhost:5000/user/trashes/${data.noteId}`,
+        `${BASE_URL}/user/trashes/${data.noteId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
@@ -103,16 +97,20 @@ function Trash() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries();
-      toast.success(data);
+      toast.success(data, {
+        position: matches ? "bottom-right" : "top-center",
+      });
     },
     onError: (err: any) => {
-      toast.error(err.response.data.message);
+      toast.error(err.response.data.message, {
+        position: matches ? "bottom-right" : "top-center",
+      });
     },
   });
   const restoreNote = useMutation({
     mutationFn: async (data: NoteTrashData) => {
       const response = await axiosIntercept.delete(
-        `http://localhost:5000/user/trashes/restore/${data.noteId}`,
+        `${BASE_URL}/user/trashes/restore/${data.noteId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,

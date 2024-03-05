@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
-import axios from "axios";
+import { useEffect } from "react";
 import { refreshToken } from "./refreshToken";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
+import { BASE_URL } from "@/utils/baseUrl";
 export interface Data {
   email: string;
   username: string;
@@ -22,7 +23,6 @@ function Signup() {
   const matches = useMediaQuery("(min-width: 640px)");
   const [showPassword, setShowPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset, formState, watch } = useForm<Data>({
     defaultValues: {
       email: "",
@@ -33,41 +33,12 @@ function Signup() {
   });
 
   const { errors } = formState;
-  const [user, setUserData] = useState({} as Data);
-
-  // async function formSubmit(data: Data) {
-  //   setUserData(data);
-  //   try {
-  //     setLoading(true);
-  //     const url = await axios.post("http://localhost:5000/auth/signup", data, {
-  //       headers: { "Content-Type": "application/json" },
-  //       withCredentials: true,
-  //     });
-  //     if (url.status === 201) {
-  //       toast.success(url.data.message as React.ReactNode, {
-  //         position: matches ? "bottom-right" : "top-center",
-  //       });
-  //       reset();
-  //       router.push("/login");
-  //     }
-  //   } catch (err: any) {
-  //     toast.success(err.response.data.message, {
-  //       position: matches ? "bottom-right" : "top-center",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
   const signupMutation = useMutation({
     mutationFn: async (data: Data) => {
-      const response = await axios.post(
-        "http://localhost:5000/auth/signup",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/auth/signup`, data, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
       return response.data.message;
     },
     onSuccess: (data) => {

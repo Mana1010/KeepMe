@@ -5,10 +5,6 @@ import keepMeIcon from "./components/img/keepMe.png";
 import Link from "next/link";
 import { utilStore } from "@/store/util.store";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import security from "./components/img/cyber-security.png";
-import responsiveness from "./components/img/ui-design.png";
-import tokenbased from "./components/img/tokens.png";
 import { MdOutlineSecurity, MdPhonelink } from "react-icons/md";
 import { GiToken } from "react-icons/gi";
 export default function Home() {
@@ -98,10 +94,10 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <footer className="pt-5 h-[110px] w-full bg-[#171717] flex items-center justify-center flex-col space-y-1 py-2.5">
-        <h1 className="text-white text-[1.5rem]">KeepMe</h1>
+      <footer className="pt-5 h-[90px] w-full bg-[#171717] flex items-center justify-center flex-col space-y-1 py-3">
+        <h1 className="text-white text-[1.3rem]">KeepMe</h1>
         <small className="text-white">Made with: TRISTAN VIC CLARITO</small>
-        <small className="text-white font-bold">ALL RIGHT RESERVED 2023</small>
+        <small className="text-white font-bold">ALL RIGHT RESERVED 2024</small>
       </footer>
     </main>
   );

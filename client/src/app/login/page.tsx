@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { utilStore } from "@/store/util.store";
 import { useMutation } from "@tanstack/react-query";
+import { BASE_URL } from "@/utils/baseUrl";
 interface Data {
   username: string;
   password: string;
@@ -29,46 +30,13 @@ function Login() {
       password: "",
     },
   });
-  // async function formSubmit(data: Data) {
-  //   try {
-  //     setLoading(true);
-  //     const url = await axios.post("http://localhost:5000/auth/login", data, {
-  //       headers: { "Content-Type": "application/json" },
-  //       withCredentials: true,
-  //     });
-  //     if (url.status === 200) {
-  //       toast.success(url.data.message, {
-  //         position: matches ? "bottom-right" : "top-center",
-  //       });
-  //       localStorage.setItem("userToken", url.data.token);
-  //       reset();
-  //       setCurrentUser();
-  //       router.push("/notes");
-  //     }
-  //   } catch (err: any) {
-  //     toast.error(
-  //       err.response?.data.message
-  //         ? err.response.data.message
-  //         : "Error while logging in, please try again",
-  //       {
-  //         position: matches ? "bottom-right" : "top-center",
-  //       }
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
 
   const loginMutation = useMutation({
     mutationFn: async (data: Data) => {
-      const response = await axios.post(
-        "http://localhost:5000/auth/login",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/auth/login`, data, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
       return response.data;
     },
     onSuccess: (data) => {

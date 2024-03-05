@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import Alert from "@/components/ui/ExpiredToken";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
 import { utilStore } from "@/store/util.store";
+import { BASE_URL } from "@/utils/baseUrl";
 export interface Data {
   password: string;
   newpassword: string;
@@ -37,7 +38,7 @@ function ChangePassword() {
   const changePasswordMutation = useMutation({
     mutationFn: async (data: Data) => {
       const response = await axiosIntercept.patch(
-        "http://localhost:5000/auth/changepassword",
+        `${BASE_URL}/auth/changepassword`,
         data
       );
       return response.data.message;

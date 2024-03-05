@@ -9,12 +9,12 @@ import { IoColorFillOutline } from "react-icons/io5";
 import { TbBold, TbItalic } from "react-icons/tb";
 import { LiaListAltSolid, LiaListUlSolid } from "react-icons/lia";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
 import { noteStore } from "@/store/note.store";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { BASE_URL } from "@/utils/baseUrl";
 
 interface Data {
   setAddNote: any;
@@ -87,7 +87,7 @@ function AddNote({ setAddNote }: Data) {
   const mutateNote = useMutation({
     mutationFn: async () => {
       const response = await axiosIntercept.post(
-        "http://localhost:5000/user/notes",
+        `${BASE_URL}/user/notes`,
         note,
         {
           headers: {

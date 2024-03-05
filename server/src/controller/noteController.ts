@@ -3,12 +3,6 @@ import asyncHandler from "express-async-handler";
 import { Notes, NotesDocument } from "../model/noteModel";
 import { Trash } from "../model/trashModel";
 import { Archive } from "../model/archiveModel";
-import {
-  addDays,
-  addSeconds,
-  differenceInDays,
-  differenceInSeconds,
-} from "date-fns";
 export const addNote = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) {
     res.status(401);

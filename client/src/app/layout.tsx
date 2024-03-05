@@ -30,7 +30,7 @@ export default function RootLayout({
             <Header />
             <NextTopLoader color="#120C18" shadow={false} />
             {children}
-            <Toaster duration={1500} theme="system" />
+            <Toaster duration={800} theme="system" />
             <ToasterUI />
           </div>
         </Provider>

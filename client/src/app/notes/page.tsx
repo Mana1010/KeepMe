@@ -27,6 +27,7 @@ import { MdOutlineHeartBroken } from "react-icons/md";
 import noResult from "../components/img/no-result-found.png";
 import { MdInfoOutline as CiCircleInfo } from "react-icons/md";
 import useAxiosIntercept from "@/api/useAxiosIntercept";
+import { BASE_URL } from "@/utils/baseUrl";
 import {
   Popover,
   PopoverContent,
@@ -55,10 +56,8 @@ function Notes() {
   const [addNote, setAddNote] = useState(false);
   const [searchedNoteTitle, setSearchedNoteTitle] = useState<string>("");
   const router = useRouter();
-  const { setCurrentUser, openAlert } = utilStore();
+  const { openAlert } = utilStore();
   const {
-    isError,
-    error,
     isLoading,
     data,
   }: {
@@ -70,15 +69,12 @@ function Notes() {
   } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
-      const response = await axiosIntercept.get(
-        "http://localhost:5000/user/notes",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axiosIntercept.get(`${BASE_URL}/user/notes`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+        withCredentials: true,
+      });
       return response.data.message;
     },
   });
@@ -86,7 +82,7 @@ function Notes() {
   const mutatePinNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axiosIntercept.patch(
-        `http://localhost:5000/user/notes/pin/${data.noteId}`,
+        `${BASE_URL}/user/notes/pin/${data.noteId}`,
         { isPinned: !data.isPinned },
         {
           headers: {
@@ -112,7 +108,7 @@ function Notes() {
   const mutateFavoriteNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axiosIntercept.patch(
-        `http://localhost:5000/user/notes/favorite/${data.noteId}`,
+        `${BASE_URL}/user/notes/favorite/${data.noteId}`,
         { isFavorite: !data.isFavorite },
         {
           headers: {
@@ -138,7 +134,7 @@ function Notes() {
   const deleteNote = useMutation({
     mutationFn: async (data: NoteData) => {
       const response = await axiosIntercept.delete(
-        `http://localhost:5000/user/notes/${data.noteId}`,
+        `${BASE_URL}/user/notes/${data.noteId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
