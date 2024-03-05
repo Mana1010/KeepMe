@@ -59,7 +59,7 @@ export default function Home() {
             </span>
             <h1 className="font-bold text-xl">RESPONSIVE</h1>
             <small className="text-center">
-              Experience seamless usability on any device with our app's
+              Experience seamless usability on any device with our app&apos;s
               responsive design. Whether on desktop, tablet, or smartphone,
               enjoy an optimal and intuitive interface that adapts dynamically.
               Embrace the flexibility of our design for a consistently smooth
@@ -73,7 +73,7 @@ export default function Home() {
             </span>
             <h1 className="font-bold text-xl">SECURITY</h1>
             <small className="text-center">
-              Prioritize your security with our app's robust measures, including
+              Prioritize your security with our app&apos;s robust measures, including
               advanced password hashing. Your sensitive information is encrypted
               for an added layer of protection, ensuring a secure and
               trustworthy experience within the app.
@@ -85,8 +85,8 @@ export default function Home() {
             </span>
             <h1 className="font-bold text-xl">TOKEN BASED AUTH</h1>
             <small className="text-center">
-              Fortify your app's security with token-based authentication,
-              ensuring each user's unique access. Our system goes beyond
+              Fortify your app&apos;s security with token-based authentication,
+              ensuring each user&apos;s unique access. Our system goes beyond
               passwords, employing advanced encryption for data protection and
               secure user interactions. Trust in a seamless yet robust
               experience, safeguarded against unauthorized access.
