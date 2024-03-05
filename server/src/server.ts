@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://keep-me-app.vercel.app",
     credentials: true,
   })
 );
