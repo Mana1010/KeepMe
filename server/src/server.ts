@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://keep-me-sigma.vercel.app",
-    method: "GET,POST,PATCH,DELETE",
+    method: ["GET","POST","PATCH","DELETE"],
     credentials: true,
   })
 );
