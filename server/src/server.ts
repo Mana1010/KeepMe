@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["https://keep-me-sigma.vercel.app"],
+    origin: "https://keep-me-sigma.vercel.app",
     credentials: true,
   })
 );
