@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(
   cors({
-   origin: "*",
+   origin: "https://keep-me-mern.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
